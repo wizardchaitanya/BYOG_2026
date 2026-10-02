@@ -13,9 +13,11 @@ public class ChalkPlayerController : MonoBehaviour
     public float airAccel = 40f;
     public float airDecel = 20f;
     public float waterSpeedMult = 0.5f;
+    [Range(0.2f, 1f)] public float minSpeedMult = 0.6f;   // speed multiplier at lowest health
 
     [Header("Jump")]
     public float jumpForce = 13f;
+    [Range(0.2f, 1f)] public float minJumpMult = 0.65f;   // jump multiplier at lowest health
     public float coyoteTime = 0.1f;
     public float jumpBuffer = 0.12f;
     public float fallGravityMult = 2.2f;
@@ -35,6 +37,7 @@ public class ChalkPlayerController : MonoBehaviour
 
     Rigidbody2D rb;
     ChalkPlayer chalk;
+    ChalkBodyHealth body;
     float baseGravity;
     float inputX, coyoteCounter, bufferCounter, wallLockCounter;
     bool grounded, onWall, facingRight = true;
@@ -43,6 +46,13 @@ public class ChalkPlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         chalk = GetComponent<ChalkPlayer>();
+        body = GetComponent<ChalkBodyHealth>();
+        // make sure nothing in the Inspector can lock movement
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.simulated = true;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        if (rb.gravityScale <= 0f) { Debug.LogWarning("Gravity Scale was 0, set to 3", this); rb.gravityScale = 3f; }
+        if (!groundCheck) Debug.LogError("ChalkPlayerController: GroundCheck is not assigned", this);
         baseGravity = rb.gravityScale;
     }
 
@@ -79,7 +89,7 @@ public class ChalkPlayerController : MonoBehaviour
     {
         // horizontal
         float speedMult = (chalk && chalk.InWater) ? waterSpeedMult : 1f;
-        float target = wallLockCounter > 0f ? rb.velocity.x : inputX * maxSpeed * speedMult;
+        float target = wallLockCounter > 0f ? rb.velocity.x : inputX * maxSpeed * speedMult * SpeedScale;
         bool accelerating = Mathf.Abs(inputX) > 0.01f && wallLockCounter <= 0f;
         float rate = grounded ? (accelerating ? groundAccel : groundDecel)
                               : (accelerating ? airAccel : airDecel);
@@ -96,16 +106,21 @@ public class ChalkPlayerController : MonoBehaviour
         rb.velocity = new Vector2(vx, vy);
     }
 
+    // smaller (lower health) = slower and weaker jump
+    float Health01 => body ? body.Health01 : 1f;
+    float SpeedScale => Mathf.Lerp(minSpeedMult, 1f, Health01);
+    float JumpScale => Mathf.Lerp(minJumpMult, 1f, Health01);
+
     void Jump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce * JumpScale);
         bufferCounter = 0f; coyoteCounter = 0f;
     }
 
     void WallJump()
     {
         float away = facingRight ? -1f : 1f;
-        rb.velocity = new Vector2(away * wallJumpForce.x, wallJumpForce.y);
+        rb.velocity = new Vector2(away * wallJumpForce.x * JumpScale, wallJumpForce.y * JumpScale);
         wallLockCounter = wallJumpLock;
         bufferCounter = 0f;
         Flip();

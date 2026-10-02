@@ -30,10 +30,11 @@ public class ChalkPlayer : MonoBehaviour
         Sheltered = Physics2D.Raycast(p + Vector2.up * 0.6f, Vector2.up, 50f, coverMask);
         InWater = Physics2D.OverlapPoint(feet ? (Vector2)feet.position : p, waterMask);
 
+        float rain = RainManager.Intensity;   // 0 = dry level, 1 = heavy rain
         float drain = 0f;
-        if (InWater)        { drain = waterDrain; Wetness += wetGainRate * 3f * Time.deltaTime; }
-        else if (!Sheltered){ drain = rainDrain;  Wetness += wetGainRate * Time.deltaTime; }
-        else                { Wetness -= wetLoseRate * Time.deltaTime; }
+        if (InWater)                         { drain = waterDrain;        Wetness += wetGainRate * 3f * Time.deltaTime; }
+        else if (!Sheltered && rain > 0.01f) { drain = rainDrain * rain;  Wetness += wetGainRate * rain * Time.deltaTime; }
+        else                                 { Wetness -= wetLoseRate * Time.deltaTime; }
 
         Wetness = Mathf.Clamp01(Wetness);
         Damage(drain * Time.deltaTime);
