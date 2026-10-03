@@ -36,6 +36,8 @@ public class ChalkDrawer : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.IsPlaying) { if (points.Count > 0) Finish(); return; }
+
         if (Input.GetMouseButtonDown(0))
         {
             points.Clear();

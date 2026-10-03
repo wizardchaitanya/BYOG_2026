@@ -58,6 +58,8 @@ public class ChalkPlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.IsPlaying) { inputX = 0f; bufferCounter = 0f; return; }
+
         inputX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) bufferCounter = jumpBuffer;
 
