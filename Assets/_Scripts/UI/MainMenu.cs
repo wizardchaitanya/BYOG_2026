@@ -23,7 +23,7 @@ public class MainMenu : MonoBehaviour
         ShowMain();
     }
 
-    public void Play() { SceneManager.LoadScene(firstLevelSceneName); }
+    public void Play() { AudioManager.UIClick(); SceneManager.LoadScene(firstLevelSceneName); }
 
     public void ShowMain()
     {
@@ -31,8 +31,12 @@ public class MainMenu : MonoBehaviour
         levelsPanel.SetActive(false);
     }
 
+    // for the Back button (plays a click; ShowMain itself is silent because Start calls it)
+    public void Back() { AudioManager.UIClick(); ShowMain(); }
+
     public void ShowLevels()
     {
+        AudioManager.UIClick();
         mainPanel.SetActive(false);
         levelsPanel.SetActive(true);
         BuildLevelButtons();
@@ -40,6 +44,7 @@ public class MainMenu : MonoBehaviour
 
     public void Quit()
     {
+        AudioManager.UIClick();
         Application.Quit();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

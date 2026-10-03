@@ -27,7 +27,7 @@ public class ChalkStroke : MonoBehaviour
 
         lr = gameObject.AddComponent<LineRenderer>();
         lr.useWorldSpace = false;
-        lr.material = new Material(Shader.Find("Sprites/Default"));
+        ChalkVisuals.Apply(lr, width);
         lr.startWidth = lr.endWidth = width;
         lr.numCapVertices = 4; lr.numCornerVertices = 4;
         lr.sortingOrder = 5;
@@ -68,6 +68,14 @@ public class ChalkStroke : MonoBehaviour
 
         if (t > 0.85f && col.enabled) col.enabled = false; // stops being solid before vanishing
         if (t >= 1f) Destroy(gameObject);
+    }
+
+    // called by crushers etc. to snap the stroke
+    public void Break()
+    {
+        if (col) col.enabled = false;
+        AudioManager.StrokeBreak();
+        Destroy(gameObject);
     }
 
     // fraction of the stroke sitting in water -> faster dissolve

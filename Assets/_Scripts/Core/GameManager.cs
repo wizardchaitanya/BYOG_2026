@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
     public void Resume()
     {
         if (State != GameState.Paused) return;
+        AudioManager.UIClick();
         Time.timeScale = 1f;
         SetState(GameState.Playing);
     }
@@ -109,12 +110,14 @@ public class GameManager : MonoBehaviour
     // button hooks
     public void Restart()
     {
+        AudioManager.UIClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void NextLevel()
     {
+        AudioManager.UIClick();
         Time.timeScale = 1f;
         if (HasNextLevel) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         else LoadMenu();
@@ -122,6 +125,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadMenu()
     {
+        AudioManager.UIClick();
         Time.timeScale = 1f;
         SceneManager.LoadScene(menuSceneName);
     }
@@ -130,6 +134,7 @@ public class GameManager : MonoBehaviour
     {
         State = s;
         StateChanged?.Invoke(s);
+        AudioManager.OnGameState(s);
     }
 
     public static string FormatTime(float t)
