@@ -35,7 +35,11 @@ public class ChalkPlayerController : MonoBehaviour
     public Transform wallCheck;              // point at body side, slightly out from collider
     public float wallCheckRadius = 0.12f;
 
+    [Header("Audio")]
+    public float footstepInterval = 0.38f;
+
     Rigidbody2D rb;
+    float stepTimer, airVy;
     ChalkPlayer chalk;
     ChalkBodyHealth body;
     float baseGravity;
@@ -63,7 +67,19 @@ public class ChalkPlayerController : MonoBehaviour
         inputX = Input.GetAxisRaw("Horizontal");
         if (Input.GetButtonDown("Jump")) bufferCounter = jumpBuffer;
 
+        bool wasGrounded = grounded;
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask);
+
+        // audio: landing + footsteps
+        if (!grounded) airVy = rb.velocity.y;
+        else if (!wasGrounded && airVy < -4f) AudioManager.Land();
+
+        if (grounded && Mathf.Abs(inputX) > 0.01f && Mathf.Abs(rb.velocity.x) > 0.5f)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f) { AudioManager.Footstep(); stepTimer = footstepInterval / SpeedScale; }
+        }
+        else stepTimer = 0f;
         float dir = facingRight ? 1f : -1f;
         onWall = !grounded && wallCheck &&
                  Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundMask);
@@ -116,6 +132,7 @@ public class ChalkPlayerController : MonoBehaviour
     void Jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce * JumpScale);
+        AudioManager.Jump();
         bufferCounter = 0f; coyoteCounter = 0f;
     }
 
@@ -124,6 +141,7 @@ public class ChalkPlayerController : MonoBehaviour
         float away = facingRight ? -1f : 1f;
         rb.velocity = new Vector2(away * wallJumpForce.x * JumpScale, wallJumpForce.y * JumpScale);
         wallLockCounter = wallJumpLock;
+        AudioManager.Jump();
         bufferCounter = 0f;
         Flip();
     }

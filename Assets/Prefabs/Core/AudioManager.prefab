@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4536209479276914579
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1799456512625474456}
+  - component: {fileID: 3444655750721972658}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1799456512625474456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4536209479276914579}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3444655750721972658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4536209479276914579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32d6131313412fc4da28d43fcd734f84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  masterVolume: 1
+  musicVolume: 0.5
+  sfxVolume: 1
+  menuMusic: {fileID: 0}
+  levelMusic: []
+  musicFade: 1.5
+  pauseDuck: 0.3
+  footsteps:
+  - {fileID: 8300000, guid: db71c41129d47bd4b9e27a19c1341398, type: 3}
+  - {fileID: 8300000, guid: 9e5d399dec25170468eba3fcba56c5a7, type: 3}
+  - {fileID: 8300000, guid: b29ff856e77447847bf6d1e3575d43bf, type: 3}
+  jump: {fileID: 8300000, guid: c4d8640774c269d478346e4b40026f27, type: 3}
+  land: {fileID: 8300000, guid: 8c52b43203d4f5b4e8461606c8753daa, type: 3}
+  drawLoop: {fileID: 8300000, guid: 5c642cb7f3593344c83d32bc3a5ae0cb, type: 3}
+  drawMaxVolume: 1
+  drawMinPitch: 0.9
+  drawMaxPitch: 1.1
+  drawFullSpeed: 8
+  strokeBreak: {fileID: 8300000, guid: 1230d7877fb05924fb696efd80c06723, type: 3}
+  crusherSlam: {fileID: 8300000, guid: 6fbeab956b53b9d46a41a16a49f12495, type: 3}
+  hearDistance: 25
+  death: {fileID: 8300000, guid: 8eca4944424a713469f5614a1d9359ed, type: 3}
+  levelComplete: {fileID: 8300000, guid: 2e7635d4ba9165f4da504b2417e9682f, type: 3}
+  uiClick: {fileID: 8300000, guid: 9755efbed02e4af43a59fee3f54a6b8e, type: 3}

@@ -26,6 +26,6 @@ public class LevelButton : MonoBehaviour
 
         button.interactable = unlocked;
         button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(() => SceneManager.LoadScene(buildIndex));
+        button.onClick.AddListener(() => { AudioManager.UIClick(); SceneManager.LoadScene(buildIndex); });
     }
 }

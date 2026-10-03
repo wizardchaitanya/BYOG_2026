@@ -10,7 +10,8 @@ public class ChalkDrawer : MonoBehaviour
     [Header("Drawing")]
     public float minPointDistance = 0.15f;
     public float costPerUnit = 2f;          // powder per world unit of line
-    public float lineWidth = 0.12f;
+    public float lineWidth = 0.15f;
+    public Texture2D chalkTexture;          // optional: your own chalk PNG (leave empty for the built-in one)
     public bool strokesAreDynamic = false;  // true = strokes fall / roll like Crayon Physics
 
     [Header("Stroke lifetime")]
@@ -31,6 +32,7 @@ public class ChalkDrawer : MonoBehaviour
     void Start()
     {
         if (!cam) cam = Camera.main;
+        ChalkVisuals.SetCustomTexture(chalkTexture);
         preview = CreateLine(new GameObject("ChalkPreview"));
     }
 
@@ -46,10 +48,12 @@ public class ChalkDrawer : MonoBehaviour
             // wetness is locked in when you start the stroke
             lifetimeForThisStroke = baseLifetime * (1f + wetDurabilityBonus * player.Wetness);
             AddPoint(start);
+            AudioManager.Draw(start);
         }
         else if (Input.GetMouseButton(0) && points.Count > 0)
         {
             Vector2 m = MouseWorld();
+            AudioManager.Draw(m);
             float d = Vector2.Distance(points[points.Count - 1], m);
             if (d >= minPointDistance)
             {
@@ -104,7 +108,7 @@ public class ChalkDrawer : MonoBehaviour
     LineRenderer CreateLine(GameObject go)
     {
         var lr = go.AddComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("Sprites/Default"));
+        ChalkVisuals.Apply(lr, lineWidth);
         lr.startWidth = lr.endWidth = lineWidth;
         lr.numCapVertices = 4;
         lr.numCornerVertices = 4;

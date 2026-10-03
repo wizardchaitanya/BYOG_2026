@@ -48,7 +48,8 @@ MonoBehaviour:
   cam: {fileID: 0}
   minPointDistance: 0.15
   costPerUnit: 2
-  lineWidth: 0.12
+  lineWidth: 0.2
+  chalkTexture: {fileID: 0}
   strokesAreDynamic: 0
   baseLifetime: 8
   wetDurabilityBonus: 1
@@ -58,7 +59,7 @@ MonoBehaviour:
     m_Bits: 512
   blockedMask:
     serializedVersion: 2
-    m_Bits: 152
+    m_Bits: 1160
   strokeLayerName: Chalk
   waterMask:
     serializedVersion: 2
