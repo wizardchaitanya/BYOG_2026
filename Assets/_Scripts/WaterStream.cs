@@ -107,6 +107,13 @@ public class WaterStream : MonoBehaviour
             float len = hit ? hit.distance : maxLength;
             bool flowing = len > 0.05f;
 
+            // a stroke that is blocking the water gets soaked: tell it, so it dissolves faster
+            if (hit)
+            {
+                var stroke = hit.collider.GetComponentInParent<ChalkStroke>();
+                if (stroke) stroke.HitByWater(Mathf.Max(colW / Mathf.Max(stroke.Length, 0.01f), 0.2f));
+            }
+
             c.col.enabled = flowing;
 
             float bottom = flowing ? -len : 0f;

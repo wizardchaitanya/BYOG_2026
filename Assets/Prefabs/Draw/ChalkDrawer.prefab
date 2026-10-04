@@ -58,7 +58,7 @@ MonoBehaviour:
   anchorRadius: 0.5
   baseLifetime: 8
   wetDurabilityBonus: 1
-  waterDissolveMultiplier: 4
+  waterDissolveMultiplier: 2
   drawableMask:
     serializedVersion: 2
     m_Bits: 512

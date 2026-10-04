@@ -50,6 +50,9 @@ TagManager:
   - name: Ground
     uniqueID: 3726552603
     locked: 0
+  - name: Ghost2
+    uniqueID: 3434367991
+    locked: 0
   - name: Ghost
     uniqueID: 3626908149
     locked: 0
