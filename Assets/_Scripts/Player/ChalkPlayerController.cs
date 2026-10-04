@@ -46,6 +46,8 @@ public class ChalkPlayerController : MonoBehaviour
     float inputX, coyoteCounter, bufferCounter, wallLockCounter;
     bool grounded, onWall, facingRight = true;
 
+    public bool Grounded => grounded;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

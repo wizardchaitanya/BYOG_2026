@@ -8,6 +8,9 @@ public class ChalkStroke : MonoBehaviour
     readonly List<Collider2D> cols = new List<Collider2D>();
     Vector2[] localPoints;
     bool solid = true;
+    float pendingExposure;
+
+    public float Length { get; private set; }   // total drawn length
     float life, age, waterMult, width, rate = 1f, nextCheck;
     LayerMask waterMask;
 
@@ -45,6 +48,7 @@ public class ChalkStroke : MonoBehaviour
             Vector2 d = b - a;
             float len = d.magnitude;
             if (len < 0.001f) continue;
+            Length += len;
 
             var seg = new GameObject("Seg");
             seg.layer = gameObject.layer;
@@ -69,7 +73,10 @@ public class ChalkStroke : MonoBehaviour
     {
         if (Time.time >= nextCheck) { nextCheck = Time.time + 0.25f; CheckWater(); }
 
-        age += Time.deltaTime * rate;
+        // water falling straight onto this stroke (WaterStream reports it) dissolves it faster
+        float streamRate = Mathf.Lerp(1f, waterMult, Mathf.Clamp01(pendingExposure));
+        pendingExposure = 0f;
+        age += Time.deltaTime * Mathf.Max(rate, streamRate);
         float t = Mathf.Clamp01(age / life);
 
         var color = new Color(1f, 1f, 1f, 1f - t * t);
@@ -80,6 +87,9 @@ public class ChalkStroke : MonoBehaviour
         if (t > 0.85f && solid) SetSolid(false);   // stops being solid before vanishing
         if (t >= 1f) Destroy(gameObject);
     }
+
+    // called every frame by a WaterStream column that is landing on this stroke
+    public void HitByWater(float amount) { pendingExposure += amount; }
 
     void SetSolid(bool on)
     {
