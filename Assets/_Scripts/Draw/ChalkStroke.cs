@@ -1,18 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // One drawn line: solid collider + dissolves over time (faster in water).
 public class ChalkStroke : MonoBehaviour
 {
     LineRenderer lr;
-    PolygonCollider2D col;
-    Vector2[] worldPoints;
+    readonly List<Collider2D> cols = new List<Collider2D>();
+    Vector2[] localPoints;
+    bool solid = true;
     float life, age, waterMult, width, rate = 1f, nextCheck;
     LayerMask waterMask;
 
     public void Init(Vector2[] pts, float lifetime, LayerMask water,
                      float waterDissolveMult, float lineWidth, bool dynamic)
     {
-        worldPoints = pts;
         life = lifetime; waterMask = water; waterMult = waterDissolveMult; width = lineWidth;
 
         // pivot at centroid so dynamic strokes rotate sensibly
@@ -24,6 +25,7 @@ public class ChalkStroke : MonoBehaviour
         var local = new Vector2[pts.Length];
         var local3 = new Vector3[pts.Length];
         for (int i = 0; i < pts.Length; i++) { local[i] = pts[i] - c; local3[i] = local[i]; }
+        localPoints = local;
 
         lr = gameObject.AddComponent<LineRenderer>();
         lr.useWorldSpace = false;
@@ -34,17 +36,26 @@ public class ChalkStroke : MonoBehaviour
         lr.positionCount = pts.Length;
         lr.SetPositions(local3);
 
-        // one quad per segment: edge colliders can't collide with each other, polygons can
-        col = gameObject.AddComponent<PolygonCollider2D>();
-        col.pathCount = local.Length - 1;
-        float h = width * 0.5f;
+        // One capsule per segment, each on its own child object (same Rigidbody2D).
+        // Separate colliders may overlap freely. (Overlapping paths inside ONE PolygonCollider2D
+        // cut holes in each other, which let water and objects slip through straight lines.)
         for (int i = 0; i < local.Length - 1; i++)
         {
             Vector2 a = local[i], b = local[i + 1];
-            Vector2 dir = (b - a).normalized;
-            Vector2 n = new Vector2(-dir.y, dir.x) * h;
-            Vector2 ext = dir * h;
-            col.SetPath(i, new Vector2[] { a - ext + n, b + ext + n, b + ext - n, a - ext - n });
+            Vector2 d = b - a;
+            float len = d.magnitude;
+            if (len < 0.001f) continue;
+
+            var seg = new GameObject("Seg");
+            seg.layer = gameObject.layer;
+            seg.transform.SetParent(transform, false);
+            seg.transform.localPosition = (a + b) * 0.5f;
+            seg.transform.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
+
+            var cap = seg.AddComponent<CapsuleCollider2D>();
+            cap.direction = CapsuleDirection2D.Horizontal;
+            cap.size = new Vector2(len + width, width);   // rounded ends cover the joints
+            cols.Add(cap);
         }
 
         if (dynamic)
@@ -66,14 +77,20 @@ public class ChalkStroke : MonoBehaviour
         float w = width * Mathf.Lerp(1f, 0.3f, t);
         lr.startWidth = lr.endWidth = w;
 
-        if (t > 0.85f && col.enabled) col.enabled = false; // stops being solid before vanishing
+        if (t > 0.85f && solid) SetSolid(false);   // stops being solid before vanishing
         if (t >= 1f) Destroy(gameObject);
+    }
+
+    void SetSolid(bool on)
+    {
+        solid = on;
+        foreach (var c in cols) if (c) c.enabled = on;
     }
 
     // called by crushers etc. to snap the stroke
     public void Break()
     {
-        if (col) col.enabled = false;
+        SetSolid(false);
         AudioManager.StrokeBreak();
         Destroy(gameObject);
     }
@@ -82,9 +99,9 @@ public class ChalkStroke : MonoBehaviour
     void CheckWater()
     {
         if (waterMask.value == 0) return;
-        int hit = 0, step = Mathf.Max(1, worldPoints.Length / 8), n = 0;
-        for (int i = 0; i < worldPoints.Length; i += step, n++)
-            if (Physics2D.OverlapPoint(transform.TransformPoint(worldPoints[i] - (Vector2)transform.position), waterMask)) hit++;
+        int hit = 0, step = Mathf.Max(1, localPoints.Length / 8), n = 0;
+        for (int i = 0; i < localPoints.Length; i += step, n++)
+            if (Physics2D.OverlapPoint(transform.TransformPoint(localPoints[i]), waterMask)) hit++;
         float frac = n > 0 ? (float)hit / n : 0f;
         rate = Mathf.Lerp(1f, waterMult, frac);
     }

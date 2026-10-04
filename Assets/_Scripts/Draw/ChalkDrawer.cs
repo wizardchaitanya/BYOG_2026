@@ -12,7 +12,11 @@ public class ChalkDrawer : MonoBehaviour
     public float costPerUnit = 2f;          // powder per world unit of line
     public float lineWidth = 0.15f;
     public Texture2D chalkTexture;          // optional: your own chalk PNG (leave empty for the built-in one)
-    public bool strokesAreDynamic = false;  // true = strokes fall / roll like Crayon Physics
+    public bool strokesAreDynamic = false;  // only used when Auto Static is off
+    [Header("Auto static / dynamic")]
+    public bool autoStatic = true;          // both ends touching something solid = static, otherwise it falls
+    public LayerMask anchorMask;            // what counts as solid: Ground, platforms, objects, Chalk
+    public float anchorRadius = 0.3f;       // how close an end must be to count as touching
 
     [Header("Stroke lifetime")]
     public float baseLifetime = 8f;
@@ -84,11 +88,27 @@ public class ChalkDrawer : MonoBehaviour
 
     void BuildStroke()
     {
+        bool dynamicStroke = autoStatic
+            ? !(IsAnchored(points[0]) && IsAnchored(points[points.Count - 1]))
+            : strokesAreDynamic;
+
         var go = new GameObject("ChalkStroke");
         go.layer = LayerMask.NameToLayer(strokeLayerName);
         var stroke = go.AddComponent<ChalkStroke>();
         stroke.Init(points.ToArray(), lifetimeForThisStroke, waterMask,
-                    waterDissolveMultiplier, lineWidth, strokesAreDynamic);
+                    waterDissolveMultiplier, lineWidth, dynamicStroke);
+    }
+
+    // an end is anchored if it touches something that will not move (static collider or static stroke)
+    bool IsAnchored(Vector2 p)
+    {
+        foreach (var c in Physics2D.OverlapCircleAll(p, anchorRadius, anchorMask))
+        {
+            if (c.isTrigger) continue;
+            var rb = c.attachedRigidbody;
+            if (rb == null || rb.bodyType == RigidbodyType2D.Static) return true;
+        }
+        return false;
     }
 
     bool CanDraw(Vector2 p) =>
