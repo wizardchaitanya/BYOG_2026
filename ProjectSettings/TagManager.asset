@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Chalk
   - Ground
-  - Water
+  - 
   - Drawable
   - Crusher
   - 
@@ -49,4 +49,10 @@ TagManager:
     locked: 0
   - name: Ground
     uniqueID: 3726552603
+    locked: 0
+  - name: Ghost
+    uniqueID: 3626908149
+    locked: 0
+  - name: Water
+    uniqueID: 47389833
     locked: 0

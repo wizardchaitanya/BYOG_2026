@@ -56,12 +56,11 @@ public class GameUI : MonoBehaviour
 
     void ShowComplete()
     {
-        if (timeText) timeText.text = "Time  " + GameManager.FormatTime(gm.Timer) +
-                                      "   (par " + GameManager.FormatTime(gm.parTime) + ")";
+        if (timeText) timeText.text = "Time  " + GameManager.FormatTime(gm.Timer);
         if (chalkText) chalkText.text = "Chalk left  " + Mathf.RoundToInt(gm.HealthScore * 100f) + "%";
         if (bestText) bestText.text = gm.NewBest
             ? "New best!"
-            : "Best  " + gm.BestScore.ToString("0.0") + " / 10   " + GameManager.FormatTime(gm.BestTime);
+            : "Best  " + gm.BestScore.ToString("0.0") + " / 10   " /*+ GameManager.FormatTime(gm.BestTime)*/;
         Show(nextButton, gm.HasNextLevel);
         StartCoroutine(CountUp());
     }

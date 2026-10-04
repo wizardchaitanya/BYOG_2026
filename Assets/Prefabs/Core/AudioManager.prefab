@@ -45,10 +45,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   masterVolume: 1
-  musicVolume: 0.5
+  musicVolume: 0.17
   sfxVolume: 1
-  menuMusic: {fileID: 0}
-  levelMusic: []
+  menuMusic: {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
+  levelMusic:
+  - {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
+  - {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
+  - {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
+  - {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
+  - {fileID: 8300000, guid: a97bcb6fcd7011f41874f5ee2a5e0743, type: 3}
   musicFade: 1.5
   pauseDuck: 0.3
   footsteps:
