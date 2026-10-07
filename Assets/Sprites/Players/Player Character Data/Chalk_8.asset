@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2510e760456038d49b5a76c1aaffe5fd, type: 3}
+  m_Name: Chalk_8
+  m_EditorClassIdentifier: 
+  displayName: Chalk - 8
+  sprite: {fileID: 21300000, guid: 8641512d625f1424dbb29a626eff5632, type: 3}
+  previewSprite: {fileID: 21300000, guid: 8641512d625f1424dbb29a626eff5632, type: 3}
+  defaultChalkColor: {r: 1, g: 1, b: 1, a: 1}
+  animator: {fileID: 0}
+  visualScale: 1
+  overrideCollider: 0
+  colliderSize: {x: 0.8, y: 1.8}
+  colliderOffset: {x: 0, y: 0}

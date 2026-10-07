@@ -30,8 +30,12 @@ public class ChalkDrawer : MonoBehaviour
     public LayerMask waterMask;
 
     readonly List<Vector2> points = new List<Vector2>();
+
+    public bool IsDrawing => points.Count > 0;   // true while a stroke is being drawn
+    public Vector2 Tip { get; private set; }     // where the chalk is right now (mouse, world space)
     LineRenderer preview;
     float lifetimeForThisStroke;
+    Color strokeColor = Color.white;
 
     void Start()
     {
@@ -51,13 +55,17 @@ public class ChalkDrawer : MonoBehaviour
             if (!CanDraw(start)) return;
             // wetness is locked in when you start the stroke
             lifetimeForThisStroke = baseLifetime * (1f + wetDurabilityBonus * player.Wetness);
+            strokeColor = PlayerProfile.ChalkColor;                       // colour chosen in the character menu
+            preview.startColor = preview.endColor = strokeColor;
             AddPoint(start);
             AudioManager.Draw(start);
+            Tip = start;
         }
         else if (Input.GetMouseButton(0) && points.Count > 0)
         {
             Vector2 m = MouseWorld();
             AudioManager.Draw(m);
+            Tip = m;
             float d = Vector2.Distance(points[points.Count - 1], m);
             if (d >= minPointDistance)
             {
@@ -96,7 +104,7 @@ public class ChalkDrawer : MonoBehaviour
         go.layer = LayerMask.NameToLayer(strokeLayerName);
         var stroke = go.AddComponent<ChalkStroke>();
         stroke.Init(points.ToArray(), lifetimeForThisStroke, waterMask,
-                    waterDissolveMultiplier, lineWidth, dynamicStroke);
+                    waterDissolveMultiplier, lineWidth, dynamicStroke, strokeColor);
     }
 
     // an end is anchored if it touches something that will not move (static collider or static stroke)

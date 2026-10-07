@@ -11,6 +11,7 @@ public class MainMenu : MonoBehaviour
     [Header("Panels")]
     public GameObject mainPanel;
     public GameObject levelsPanel;
+    public GameObject charactersPanel;              // character + chalk colour picker
 
     [Header("Level select")]
     public LevelButton levelButtonPrefab;
@@ -29,10 +30,19 @@ public class MainMenu : MonoBehaviour
     {
         mainPanel.SetActive(true);
         levelsPanel.SetActive(false);
+        if (charactersPanel) charactersPanel.SetActive(false);
     }
 
     // for the Back button (plays a click; ShowMain itself is silent because Start calls it)
     public void Back() { AudioManager.UIClick(); ShowMain(); }
+
+    public void ShowCharacters()
+    {
+        AudioManager.UIClick();
+        mainPanel.SetActive(false);
+        levelsPanel.SetActive(false);
+        if (charactersPanel) charactersPanel.SetActive(true);
+    }
 
     public void ShowLevels()
     {

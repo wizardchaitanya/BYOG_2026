@@ -214,6 +214,7 @@ GameObject:
   - component: {fileID: 5067720182204187650}
   - component: {fileID: 2015394433753112531}
   - component: {fileID: 2841556562019535585}
+  - component: {fileID: 3367533806397924704}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -406,3 +407,21 @@ MonoBehaviour:
   dustRate: 25
   landingPuff: 50
   minLandSpeed: 4
+--- !u!114 &3367533806397924704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8019905014532714679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad7a8e32fb0a044c8b5ed7ea02ea5b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  database: {fileID: 11400000, guid: c3a671c2364ac7144abbe8cd46bec25d, type: 2}
+  spriteRenderer: {fileID: 7986224098158492570}
+  animator: {fileID: 0}
+  bodyCollider: {fileID: 7254782615291233671}
+  groundCheck: {fileID: 2559864087708869458}
+  wallCheck: {fileID: 176669721123601155}

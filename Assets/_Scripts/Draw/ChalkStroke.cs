@@ -9,14 +9,16 @@ public class ChalkStroke : MonoBehaviour
     Vector2[] localPoints;
     bool solid = true;
     float pendingExposure;
+    Color baseColor = Color.white;
 
     public float Length { get; private set; }   // total drawn length
     float life, age, waterMult, width, rate = 1f, nextCheck;
     LayerMask waterMask;
 
     public void Init(Vector2[] pts, float lifetime, LayerMask water,
-                     float waterDissolveMult, float lineWidth, bool dynamic)
+                     float waterDissolveMult, float lineWidth, bool dynamic, Color color)
     {
+        baseColor = color;
         life = lifetime; waterMask = water; waterMult = waterDissolveMult; width = lineWidth;
 
         // pivot at centroid so dynamic strokes rotate sensibly
@@ -36,6 +38,7 @@ public class ChalkStroke : MonoBehaviour
         lr.startWidth = lr.endWidth = width;
         lr.numCapVertices = 4; lr.numCornerVertices = 4;
         lr.sortingOrder = 5;
+        lr.startColor = lr.endColor = baseColor;
         lr.positionCount = pts.Length;
         lr.SetPositions(local3);
 
@@ -79,7 +82,7 @@ public class ChalkStroke : MonoBehaviour
         age += Time.deltaTime * Mathf.Max(rate, streamRate);
         float t = Mathf.Clamp01(age / life);
 
-        var color = new Color(1f, 1f, 1f, 1f - t * t);
+        var color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f - t * t);
         lr.startColor = lr.endColor = color;
         float w = width * Mathf.Lerp(1f, 0.3f, t);
         lr.startWidth = lr.endWidth = w;

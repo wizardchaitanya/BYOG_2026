@@ -34,6 +34,27 @@ public static class ChalkVisuals
         lr.textureScale = new Vector2(1f / Mathf.Max(0.01f, width * aspect), 1f);
     }
 
+    static Texture2D dot;
+
+    // soft round dot for particles
+    public static Texture2D Dot()
+    {
+        if (dot) return dot;
+        const int s = 32;
+        var px = new Color[s * s];
+        for (int y = 0; y < s; y++)
+            for (int x = 0; x < s; x++)
+            {
+                float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(s * 0.5f, s * 0.5f)) / (s * 0.5f);
+                px[y * s + x] = new Color(1f, 1f, 1f, Mathf.Clamp01(1f - d));
+            }
+        dot = new Texture2D(s, s, TextureFormat.RGBA32, false);
+        dot.filterMode = FilterMode.Bilinear;
+        dot.SetPixels(px);
+        dot.Apply();
+        return dot;
+    }
+
     static Texture2D Generated()
     {
         if (generated) return generated;
