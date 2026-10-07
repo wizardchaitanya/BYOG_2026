@@ -14,8 +14,14 @@ public class CharacterApplier : MonoBehaviour
 
     void Awake()
     {
+        if (GetComponent<Photon.Pun.PhotonView>()) return;   // multiplayer prefab: NetworkPlayer applies it
+        Apply(PlayerProfile.CharacterIndex);
+    }
+
+    public void Apply(int index)
+    {
         if (!database || !spriteRenderer) return;
-        var c = database.Get(PlayerProfile.CharacterIndex);
+        var c = database.Get(index);
         if (!c) return;
 
         if (c.sprite) spriteRenderer.sprite = c.sprite;

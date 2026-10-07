@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public enum GameState { Playing, Paused, Dead, Complete }
 
@@ -9,7 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     // other scripts check this; true when there is no manager in the scene
-    public static bool IsPlaying => Instance == null || Instance.State == GameState.Playing;
+    public static bool IsPlaying => Instance != null ? Instance.State == GameState.Playing : MPMatchManager.CanPlay;
 
     public ChalkPlayer player;
 
@@ -38,8 +39,15 @@ public class GameManager : MonoBehaviour
     string ScoreKey => "best_score_" + SceneManager.GetActiveScene().name;
     string TimeKey => "best_time_" + SceneManager.GetActiveScene().name;
 
-    public bool HasNextLevel =>
-        SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings;
+    public bool HasNextLevel
+    {
+        get
+        {
+            int n = SceneManager.GetActiveScene().buildIndex + 1;
+            if (n >= SceneManager.sceneCountInBuildSettings) return false;
+            return !Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(n)).StartsWith("MP_");
+        }
+    }
 
     void Awake()
     {

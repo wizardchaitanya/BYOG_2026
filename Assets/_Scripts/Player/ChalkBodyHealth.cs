@@ -22,6 +22,12 @@ public class ChalkBodyHealth : MonoBehaviour
     void Awake()
     {
         if (!player) player = GetComponent<ChalkPlayer>();
+        Capture();
+    }
+
+    public void Capture()
+    {
+        if (!player) player = GetComponent<ChalkPlayer>();
 
         if (bodyCollider is BoxCollider2D b) { colSize = b.size; colOffset = b.offset; }
         else if (bodyCollider is CapsuleCollider2D c) { colSize = c.size; colOffset = c.offset; }

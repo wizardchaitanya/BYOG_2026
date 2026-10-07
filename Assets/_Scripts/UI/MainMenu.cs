@@ -71,6 +71,7 @@ public class MainMenu : MonoBehaviour
         for (int i = 1; i < count; i++)
         {
             string sceneName = Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i));
+            if (sceneName.StartsWith("MP_")) continue;
             float best = PlayerPrefs.GetFloat("best_score_" + sceneName, 0f);
 
             var btn = Instantiate(levelButtonPrefab, levelButtonContainer);
@@ -79,4 +80,6 @@ public class MainMenu : MonoBehaviour
             previousDone = best > 0f;   // next level opens once this one has been completed
         }
     }
+
+    public void PlayMultiplayer() { AudioManager.UIClick(); SceneManager.LoadScene("MP_Lobby"); }
 }

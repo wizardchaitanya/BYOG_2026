@@ -37,6 +37,9 @@ public class ChalkDrawer : MonoBehaviour
     float lifetimeForThisStroke;
     Color strokeColor = Color.white;
 
+    // field
+    public event System.Action<Vector2[], float, bool, Color> StrokeCreated;
+
     void Start()
     {
         if (!cam) cam = Camera.main;
@@ -105,6 +108,8 @@ public class ChalkDrawer : MonoBehaviour
         var stroke = go.AddComponent<ChalkStroke>();
         stroke.Init(points.ToArray(), lifetimeForThisStroke, waterMask,
                     waterDissolveMultiplier, lineWidth, dynamicStroke, strokeColor);
+
+        StrokeCreated?.Invoke(points.ToArray(), lifetimeForThisStroke, dynamicStroke, strokeColor);
     }
 
     // an end is anchored if it touches something that will not move (static collider or static stroke)
@@ -129,6 +134,13 @@ public class ChalkDrawer : MonoBehaviour
         for (int i = 1; i <= steps; i++)
             if (!CanDraw(Vector2.Lerp(a, b, (float)i / steps))) return false;
         return true;
+    }
+
+    public void SpawnStroke(Vector2[] pts, float life, bool dyn, Color col)
+    {
+        var go = new GameObject("ChalkStroke");
+        go.layer = LayerMask.NameToLayer(strokeLayerName);
+        go.AddComponent<ChalkStroke>().Init(pts, life, waterMask, waterDissolveMultiplier, lineWidth, dyn, col);
     }
 
     Vector2 MouseWorld() => cam.ScreenToWorldPoint(Input.mousePosition);

@@ -8,7 +8,9 @@ public class LevelGoal : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!GameManager.Instance) return;
-        if (other.GetComponentInParent<ChalkPlayer>()) GameManager.Instance.CompleteLevel();
+        var player = other.GetComponentInParent<ChalkPlayer>();
+        if (!player) return;
+        if (MPMatchManager.Instance) { if (!player.isRemote) MPMatchManager.Instance.ReachedGoal(); return; }
+        if (GameManager.Instance) GameManager.Instance.CompleteLevel();
     }
 }

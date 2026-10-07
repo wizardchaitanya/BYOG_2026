@@ -102,7 +102,8 @@ public class ChalkCrusher : MonoBehaviour
 
             if (slam && InMask(h.collider, playerMask))
             {
-                if (GameManager.Instance) GameManager.Instance.PlayerDied("Crushed");
+                var victim = h.collider.GetComponentInParent<ChalkPlayer>();
+                if (victim) victim.Kill("Crushed");
                 continue;
             }
 

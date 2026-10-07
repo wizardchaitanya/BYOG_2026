@@ -6,7 +6,7 @@ public class DeathTrigger : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.GetComponentInParent<ChalkPlayer>() && GameManager.Instance)
-            GameManager.Instance.PlayerDied("Fell into the void");
+        var p = other.GetComponentInParent<ChalkPlayer>();
+        if (p) p.Kill("Fell into the void");
     }
 }

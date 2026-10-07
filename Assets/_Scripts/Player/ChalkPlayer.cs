@@ -27,12 +27,25 @@ public class ChalkPlayer : MonoBehaviour
     public bool debugSheltered;
     public string debugShelteredBy;
 
+    [Header("Regen (multiplayer)")]
+    public bool regenEnabled;
+    public float regenRate = 12f;              // powder/sec while not drawing
+    public float regenDelay = 0.6f;            // seconds after last drawing before regen starts
+    float lastSpend;
+    string deathReason;
+
+    public void Revive() { health = maxHealth; Wetness = 0f; enabled = true; }
+
     Collider2D bodyCol;
     readonly RaycastHit2D[] rayHits = new RaycastHit2D[8];
 
     public float Wetness { get; private set; }
     public bool Sheltered { get; private set; }
     public bool InWater { get; private set; }
+
+    public event System.Action Died;
+    public bool isRemote;                      // set by NetworkPlayer on the opponent's copy
+
 
     void Awake()
     {
@@ -60,6 +73,11 @@ public class ChalkPlayer : MonoBehaviour
 
         Wetness = Mathf.Clamp01(Wetness);
         Damage(drain * Time.deltaTime);
+
+        if (regenEnabled && !InWater && Time.time - lastSpend > regenDelay)
+        {
+            health = Mathf.Min(maxHealth, health + regenRate * Time.deltaTime);
+        }
     }
 
     // Is there cover above the head? Ignores triggers and the player's own colliders.
@@ -92,6 +110,7 @@ public class ChalkPlayer : MonoBehaviour
 
     public bool Spend(float amount)
     {
+        lastSpend = Time.time;
         if (health <= 0f) return false;
         Damage(amount);
         return true;
@@ -105,9 +124,18 @@ public class ChalkPlayer : MonoBehaviour
 
     void Die()
     {
-        // TODO: crumble animation
+        Died?.Invoke();
         if (GameManager.Instance)
-            GameManager.Instance.PlayerDied(InWater ? "Dissolved in the water" : "Ran out of chalk");
+            GameManager.Instance.PlayerDied(deathReason ?? (InWater ? "Dissolved in the water" : "Ran out of chalk"));
+        deathReason = null;
         enabled = false;
+    }
+
+    // anything that kills the player (void, crusher) calls this
+    public void Kill(string reason)
+    {
+        if (isRemote || !enabled) return;
+        deathReason = reason;
+        Damage(health);
     }
 }
