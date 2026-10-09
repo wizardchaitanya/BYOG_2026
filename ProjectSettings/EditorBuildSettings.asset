@@ -32,4 +32,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/Level 8.unity
     guid: 88f10e9b756226446bbb09c920db4e90
+  - enabled: 1
+    path: Assets/Scenes/MP_Lobby.unity
+    guid: 975d5631db1bd9e41aefe018d3b7e5eb
+  - enabled: 1
+    path: Assets/Scenes/MP_Map1.unity
+    guid: 57dcf98f36ffa3849890bc8b6a01e50b
   m_configObjects: {}

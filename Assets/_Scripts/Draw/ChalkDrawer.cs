@@ -37,6 +37,12 @@ public class ChalkDrawer : MonoBehaviour
     float lifetimeForThisStroke;
     Color strokeColor = Color.white;
 
+    bool holding;   // mouse button is down (may be outside the drawable area)
+
+    public event System.Action<Color> StrokeBegan;
+    public event System.Action<Vector2> PointAdded;
+    public event System.Action StrokeEnded;
+
     // field
     public event System.Action<Vector2[], float, bool, Color> StrokeCreated;
 
@@ -49,38 +55,50 @@ public class ChalkDrawer : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.IsPlaying) { if (points.Count > 0) Finish(); return; }
+        if (!GameManager.IsPlaying) { holding = false; if (points.Count > 0) Finish(); return; }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            points.Clear();
-            Vector2 start = MouseWorld();
-            if (!CanDraw(start)) return;
-            // wetness is locked in when you start the stroke
-            lifetimeForThisStroke = baseLifetime * (1f + wetDurabilityBonus * player.Wetness);
-            strokeColor = PlayerProfile.ChalkColor;                       // colour chosen in the character menu
-            preview.startColor = preview.endColor = strokeColor;
-            AddPoint(start);
-            AudioManager.Draw(start);
-            Tip = start;
-        }
-        else if (Input.GetMouseButton(0) && points.Count > 0)
+        if (Input.GetMouseButtonDown(0)) holding = true;
+
+        if (holding && Input.GetMouseButton(0))
         {
             Vector2 m = MouseWorld();
-            AudioManager.Draw(m);
-            Tip = m;
-            float d = Vector2.Distance(points[points.Count - 1], m);
-            if (d >= minPointDistance)
+
+            if (points.Count == 0)
             {
-                if (!SegmentDrawable(points[points.Count - 1], m)) Finish(); // left the drawable area
-                else if (player.Spend(d * costPerUnit)) AddPoint(m);
-                else Finish();                                  // out of chalk
+                // not drawing yet: start as soon as the cursor is over a drawable spot
+                if (player.health > 0f && CanDraw(m)) StartStroke(m);
+            }
+            else
+            {
+                AudioManager.Draw(m);
+                Tip = m;
+                float d = Vector2.Distance(points[points.Count - 1], m);
+                if (d >= minPointDistance)
+                {
+                    if (!SegmentDrawable(points[points.Count - 1], m)) Finish();   // left the drawable area (re-entering starts a new stroke)
+                    else if (player.Spend(d * costPerUnit)) AddPoint(m);
+                    else Finish();                                                 // out of chalk
+                }
             }
         }
-        else if (Input.GetMouseButtonUp(0))
+
+        if (Input.GetMouseButtonUp(0))
         {
-            Finish();
+            holding = false;
+            if (points.Count > 0) Finish();
         }
+    }
+
+    void StartStroke(Vector2 start)
+    {
+        // wetness is locked in when the stroke starts
+        lifetimeForThisStroke = baseLifetime * (1f + wetDurabilityBonus * player.Wetness);
+        strokeColor = PlayerProfile.ChalkColor;
+        preview.startColor = preview.endColor = strokeColor;
+        StrokeBegan?.Invoke(strokeColor);
+        AddPoint(start);
+        AudioManager.Draw(start);
+        Tip = start;
     }
 
     void AddPoint(Vector2 p)
@@ -88,13 +106,16 @@ public class ChalkDrawer : MonoBehaviour
         points.Add(p);
         preview.positionCount = points.Count;
         preview.SetPosition(points.Count - 1, p);
+        PointAdded?.Invoke(p);
     }
 
     void Finish()
     {
+        if (points.Count == 0) return;
         if (points.Count >= 2) BuildStroke();
         points.Clear();
         preview.positionCount = 0;
+        StrokeEnded?.Invoke();
     }
 
     void BuildStroke()

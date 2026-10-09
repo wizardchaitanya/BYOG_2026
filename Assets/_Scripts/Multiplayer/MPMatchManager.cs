@@ -63,7 +63,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
         onLocalPlayerSpawned?.Invoke(go.transform);
 
         // "I'm loaded" (tied to the room name so old values from a previous match are ignored)
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "ready", PhotonNetwork.CurrentRoom.Name } });
+        PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "ready", true } });
         CheckAllReady();
     }
 
@@ -75,7 +75,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
         int expected = PhotonNetwork.OfflineMode ? 1 : 2;
         if (PhotonNetwork.PlayerList.Length < expected) return;
         foreach (var p in PhotonNetwork.PlayerList)
-            if (!p.CustomProperties.TryGetValue("ready", out var r) || (string)r != PhotonNetwork.CurrentRoom.Name) return;
+            if (!p.CustomProperties.TryGetValue("ready", out var r) || !(bool)r) return;
 
         started = true;
         photonView.RPC(nameof(RpcStartCountdown), RpcTarget.All, PhotonNetwork.Time + countdownSeconds);
@@ -139,6 +139,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         PhotonNetwork.OfflineMode = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "ready", null } });
         SceneManager.LoadScene(lobbySceneName);
     }
 }

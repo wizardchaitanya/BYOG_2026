@@ -485,3 +485,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnDelay: 1.5
+  liveSendInterval: 0.05
+  nameFont: {fileID: 11400000, guid: 573a83c8b1aaf084987957787c3e0185, type: 2}
+  nameSize: 3
+  nameHeight: 0.35
+  localNameColor: {r: 0.6, g: 1, b: 0.6, a: 1}
+  opponentNameColor: {r: 1, g: 1, b: 1, a: 1}

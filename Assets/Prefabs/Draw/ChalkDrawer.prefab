@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 982083477169100319}
   - component: {fileID: 434211419363448451}
+  - component: {fileID: 397423887579477994}
   m_Layer: 0
   m_Name: ChalkDrawer
   m_TagString: Untagged
@@ -64,8 +65,23 @@ MonoBehaviour:
     m_Bits: 512
   blockedMask:
     serializedVersion: 2
-    m_Bits: 1032
+    m_Bits: 1152
   strokeLayerName: Chalk
   waterMask:
     serializedVersion: 2
     m_Bits: 16
+--- !u!114 &397423887579477994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8065578001631884634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbfcc337ca87f794fa9ad59db38218df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleRate: 10
+  distanceRate: 25
+  sortingOrder: 11
