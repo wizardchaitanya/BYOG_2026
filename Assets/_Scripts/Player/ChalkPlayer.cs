@@ -42,6 +42,7 @@ public class ChalkPlayer : MonoBehaviour
     public float Wetness { get; private set; }
     public bool Sheltered { get; private set; }
     public bool InWater { get; private set; }
+    public string LastDeathReason { get; private set; }
 
     public event System.Action Died;
     public bool isRemote;                      // set by NetworkPlayer on the opponent's copy
@@ -124,9 +125,9 @@ public class ChalkPlayer : MonoBehaviour
 
     void Die()
     {
+        LastDeathReason = deathReason ?? (InWater ? "Dissolved in the water" : "Ran out of chalk");
         Died?.Invoke();
-        if (GameManager.Instance)
-            GameManager.Instance.PlayerDied(deathReason ?? (InWater ? "Dissolved in the water" : "Ran out of chalk"));
+        if (GameManager.Instance) GameManager.Instance.PlayerDied(LastDeathReason);
         deathReason = null;
         enabled = false;
     }

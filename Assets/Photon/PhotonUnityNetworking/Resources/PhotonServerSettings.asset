@@ -47,6 +47,15 @@ MonoBehaviour:
   - RpcLiveBegin
   - RpcLiveEnd
   - RpcLivePoints
+  - RpcStrokeGone
+  - RpcRematchGo
+  - RpcRematchVote
+  - RpcPush
+  - RpcDead
+  - RpcBeginDrawing
+  - RpcDone
+  - RpcEndDrawing
+  - RpcEraseRequest
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

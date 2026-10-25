@@ -59,7 +59,7 @@ MonoBehaviour:
   anchorRadius: 0.5
   baseLifetime: 8
   wetDurabilityBonus: 1
-  waterDissolveMultiplier: 2
+  waterDissolveMultiplier: 1.5
   drawableMask:
     serializedVersion: 2
     m_Bits: 512
@@ -70,6 +70,7 @@ MonoBehaviour:
   waterMask:
     serializedVersion: 2
     m_Bits: 16
+  touchOffsetMm: 0
 --- !u!114 &397423887579477994
 MonoBehaviour:
   m_ObjectHideFlags: 0
