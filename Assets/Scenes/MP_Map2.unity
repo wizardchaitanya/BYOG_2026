@@ -8772,7 +8772,7 @@ MonoBehaviour:
   countdownSeconds: 3
   endMode: 1
   drawSeconds: 60
-  drawChalkLimit: 250
+  drawChalkLimit: 60
   flushDelay: 0.6
   countdownText: {fileID: 1340361419}
   resultPanel: {fileID: 1340361420}
