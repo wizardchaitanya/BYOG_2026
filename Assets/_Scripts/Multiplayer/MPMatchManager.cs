@@ -31,7 +31,11 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
     public DrawEndMode endMode = DrawEndMode.Timer;      // Timer: ends when time runs out. Button: ends when both players press Done.
     public float drawSeconds = 60f;                      // only used in Timer mode
     public float drawChalkLimit = 100f;                  // chalk available in the drawing phase (same units as ChalkDrawer cost: line length x Cost Per Unit). Erasing refunds it.
-    public float flushDelay = 0.6f;                      // wait after drawing ends so last strokes arrive before the reveal
+    public float flushDelay = 0.6f;
+
+    [Header("Race")]
+    public KeyCode resetKey = KeyCode.R;                 // back to the spawn point (also callable from a UI button: ResetMyPlayer)
+    [Range(2f, 5f)] public float raceEraseCooldown = 3f; // seconds to wait before the eraser works again (race only)                      // wait after drawing ends so last strokes arrive before the reveal
 
     [Header("UI")]
     public TMP_Text countdownText;
@@ -76,6 +80,18 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
     void SyncChalkBar()
     {
         if (NetworkPlayer.Local) NetworkPlayer.Local.SetChalk(drawChalkLimit > 0f ? DrawChalkLeft / drawChalkLimit : 0f);
+    }
+
+    // ---------- race eraser cooldown ----------
+    float eraseReadyAt;
+    public bool RaceEraseReady => Time.time >= eraseReadyAt;
+    public float RaceEraseWait => Mathf.Max(0f, eraseReadyAt - Time.time);
+    public void StartRaceEraseCooldown() { eraseReadyAt = Time.time + raceEraseCooldown; }
+
+    public void ResetMyPlayer()
+    {
+        if (Phase != MPPhase.Racing || paused) return;
+        if (NetworkPlayer.Local) NetworkPlayer.Local.ResetToSpawn();
     }
 
     public bool UsesTimer => endMode == DrawEndMode.Timer;
@@ -224,6 +240,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
         {
             if (paused) Resume(); else Pause();
         }
+        if (Input.GetKeyDown(resetKey)) ResetMyPlayer();
 
         // master decides when drawing ends: timer ran out, or everyone pressed Done
         if (Phase != MPPhase.Drawing || endSent || !PhotonNetwork.IsMasterClient || PhotonNetwork.CurrentRoom == null) return;
@@ -261,6 +278,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
 
         SetPhase(MPPhase.Racing);
         if (NetworkPlayer.Local) NetworkPlayer.Local.SetChalk(1f);      // full chalk for the race
+        eraseReadyAt = 0f;
         foreach (var s in FindObjectsOfType<ChalkStroke>()) s.SetFrozen(false);   // dynamic strokes start moving
         if (countdownText) countdownText.text = "GO!";
         yield return new WaitForSeconds(0.8f);

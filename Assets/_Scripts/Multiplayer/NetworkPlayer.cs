@@ -65,6 +65,7 @@ public class NetworkPlayer : MonoBehaviourPun, IPunObservable, IPunInstantiateMa
         {
             Local = this;
             chalk.regenEnabled = true;
+            chalk.noChalkDeath = true;          // running out of chalk doesn't kill, it just stops you drawing
             chalk.Died += OnDied;
             if (drawer)
             {
@@ -164,6 +165,17 @@ public class NetworkPlayer : MonoBehaviourPun, IPunObservable, IPunInstantiateMa
         rb.velocity = Vector2.zero;
         chalk.Revive();
         controller.enabled = true;
+    }
+
+    // R key / reset button: back to the start, chalk is NOT refilled
+    public void ResetToSpawn()
+    {
+        var m = MPMatchManager.Instance;
+        if (!m || !chalk || !chalk.enabled) return;     // dead / respawning already
+        Vector3 p = m.MySpawn;
+        rb.position = p;
+        transform.position = p;
+        rb.velocity = Vector2.zero;
     }
 
     // set chalk to a fraction of full (drawing-phase budget, or 1 = full at GO)

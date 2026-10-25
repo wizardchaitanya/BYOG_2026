@@ -22,6 +22,8 @@ public class MPDrawUI : MonoBehaviour
     [Header("Race eraser (shown during the race)")]
     public Button raceEraseButton;
     public KeyCode raceEraseKey = KeyCode.E;
+    public Image raceEraseCooldownFill;      // optional: Image Type = Filled, shows the recharge
+    public TMP_Text raceEraseCooldownText;   // optional: seconds left
 
     [Header("Done")]
     public Button doneButton;
@@ -31,6 +33,7 @@ public class MPDrawUI : MonoBehaviour
 
     enum Tool { Static, Dynamic, Erase }
     Tool tool = Tool.Static;
+    Tool lastDrawTool = Tool.Static;      // what the E key goes back to
 
     void Start()
     {
@@ -60,7 +63,7 @@ public class MPDrawUI : MonoBehaviour
         if (drw) drw.SetErasing(false);                 // every phase starts in draw mode
         if (p == MPPhase.Drawing)
         {
-            tool = Tool.Static;
+            tool = lastDrawTool = Tool.Static;
             Apply();
             // only the control for the active end mode is shown
             if (timerText) timerText.gameObject.SetActive(match.UsesTimer);
@@ -82,6 +85,7 @@ public class MPDrawUI : MonoBehaviour
     {
         AudioManager.UIClick();
         tool = t;
+        if (t != Tool.Erase) lastDrawTool = t;
         Apply();
     }
 
@@ -117,8 +121,18 @@ public class MPDrawUI : MonoBehaviour
 
     void Update()
     {
-        if (match && match.Phase == MPPhase.Racing && Input.GetKeyDown(raceEraseKey)) ToggleRaceErase();
+        if (match && match.Phase == MPPhase.Racing)
+        {
+            if (Input.GetKeyDown(raceEraseKey)) ToggleRaceErase();
+            float wait = match.RaceEraseWait;
+            if (raceEraseCooldownFill) raceEraseCooldownFill.fillAmount = wait / Mathf.Max(0.01f, match.raceEraseCooldown);
+            if (raceEraseCooldownText) raceEraseCooldownText.text = wait > 0f ? Mathf.CeilToInt(wait).ToString() : "";
+        }
         if (!match || match.Phase != MPPhase.Drawing) return;
+
+        // E: switch to the eraser, press again to go back to the previous Static/Dynamic tool
+        if (Input.GetKeyDown(raceEraseKey) && !MPMatchManager.LocalPaused)
+            Pick(tool == Tool.Erase ? lastDrawTool : Tool.Erase);
 
         if (timerText) timerText.text = Mathf.CeilToInt(match.DrawTimeLeft).ToString();
         if (doneText) doneText.text = match.IsLocalDone ? waitingLabel : doneLabel;

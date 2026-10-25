@@ -167,12 +167,20 @@ public class ChalkDrawer : MonoBehaviour
             return;
         }
 
-        // race: erase any stroke drawn during the race (mine or the opponent's), never the drawing-phase ones
+        // race: erase one stroke drawn during the race (mine or the opponent's), never the drawing-phase ones,
+        // then the eraser has to recharge
+        var m = MPMatchManager.Instance;
+        if (!m.RaceEraseReady) return;
         for (int i = ChalkStroke.All.Count - 1; i >= 0; i--)
         {
             var s = ChalkStroke.All[i];
             if (!s || s.IsPermanent) continue;
-            if (s.DistanceTo(p) <= eraseRadius) NetworkPlayer.EraseRaceStroke(s);
+            if (s.DistanceTo(p) <= eraseRadius)
+            {
+                NetworkPlayer.EraseRaceStroke(s);
+                m.StartRaceEraseCooldown();
+                break;
+            }
         }
     }
 

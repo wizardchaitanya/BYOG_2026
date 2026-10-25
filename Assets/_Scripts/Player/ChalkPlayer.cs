@@ -29,6 +29,8 @@ public class ChalkPlayer : MonoBehaviour
 
     [Header("Regen (multiplayer)")]
     public bool regenEnabled;
+    public bool noChalkDeath;                  // MP: 0 chalk does not kill (can't draw until it refills). Kill() still does.
+    bool forceDeath;
     public float regenRate = 12f;              // powder/sec while not drawing
     public float regenDelay = 0.6f;            // seconds after last drawing before regen starts
     float lastSpend;
@@ -120,7 +122,7 @@ public class ChalkPlayer : MonoBehaviour
     void Damage(float amount)
     {
         health = Mathf.Max(0f, health - amount);
-        if (health <= 0f) Die();
+        if (health <= 0f && (forceDeath || !noChalkDeath)) Die();
     }
 
     void Die()
@@ -137,6 +139,8 @@ public class ChalkPlayer : MonoBehaviour
     {
         if (isRemote || !enabled) return;
         deathReason = reason;
+        forceDeath = true;                     // void / crusher always kill
         Damage(health);
+        forceDeath = false;
     }
 }
