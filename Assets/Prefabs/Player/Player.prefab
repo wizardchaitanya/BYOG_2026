@@ -314,10 +314,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ae81a45d5fd164e96f6ae455bc2acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 37
-  health: 37
+  maxHealth: 40
+  health: 40
   rainDrain: 2
-  waterDrain: 8
+  waterDrain: 30
   wetGainRate: 0.25
   wetLoseRate: 0.1
   coverMask:
@@ -333,6 +333,7 @@ MonoBehaviour:
   debugSheltered: 0
   debugShelteredBy: 
   regenEnabled: 0
+  noChalkDeath: 0
   regenRate: 12
   regenDelay: 0.6
   isRemote: 0
