@@ -5396,14 +5396,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1224324477}
-    - target: {fileID: 2723433906758064556, guid: b71893783c7493241b88e985bbcc820f, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 247.39
-      objectReference: {fileID: 0}
-    - target: {fileID: 2723433906758064556, guid: b71893783c7493241b88e985bbcc820f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 18.34003
-      objectReference: {fileID: 0}
     - target: {fileID: 3326898296678890315, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -5512,17 +5504,9 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1224324477}
-    - target: {fileID: 6703596832599116047, guid: b71893783c7493241b88e985bbcc820f, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -250.1
-      objectReference: {fileID: 0}
     - target: {fileID: 6816789388939077087, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_Name
       value: GameUI
-      objectReference: {fileID: 0}
-    - target: {fileID: 7525508964013428901, guid: b71893783c7493241b88e985bbcc820f, type: 3}
-      propertyPath: deadzone
-      value: 0.523
       objectReference: {fileID: 0}
     - target: {fileID: 8853718204724705998, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

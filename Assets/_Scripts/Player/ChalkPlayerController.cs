@@ -64,10 +64,13 @@ public class ChalkPlayerController : MonoBehaviour
 
     void Update()
     {
+        bool mobileJump = MobileInput.JumpPressed;      // always read, so a stale press can't fire later
         if (!GameManager.IsPlaying || MPMatchManager.LocalPaused) { inputX = 0f; bufferCounter = 0f; return; }
 
-        inputX = Input.GetAxisRaw("Horizontal");
-        if (Input.GetButtonDown("Jump")) bufferCounter = jumpBuffer;
+        // keyboard + mobile joystick / buttons
+        float mobileX = MobileInput.Horizontal;
+        inputX = Mathf.Abs(mobileX) > 0.01f ? mobileX : Input.GetAxisRaw("Horizontal");
+        if (Input.GetButtonDown("Jump") || mobileJump) bufferCounter = jumpBuffer;
 
         bool wasGrounded = grounded;
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask);

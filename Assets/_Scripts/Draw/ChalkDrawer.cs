@@ -41,6 +41,22 @@ public class ChalkDrawer : MonoBehaviour
     public bool erasing;                    // MP: pointer erases your own strokes
     public float eraseRadius = 0.4f;
 
+    [Header("Cursor (desktop)")]
+    public Texture2D chalkCursor;
+    public Texture2D eraserCursor;
+    public Vector2 chalkHotspot;     // pixel in the texture that is the tip
+    public Vector2 eraserHotspot;
+    int cursorState = -1;            // 0 default, 1 chalk, 2 eraser
+    Vector2 appliedHotspot;
+
+    [Header("Player no-draw border")]
+    public float playerBorderRadius = 0.6f;   // world units around the player's body, 0 = off
+
+    [Header("Race stroke cooldown")]
+    public float strokeCooldown = 0.4f;       // seconds before the next stroke can start (race only)
+    float nextStrokeTime;
+    Collider2D bodyCol;
+
     readonly List<Vector2> points = new List<Vector2>();
     readonly List<ChalkStroke> mine = new List<ChalkStroke>();   // strokes this player drew (the eraser only touches these)
 
@@ -82,6 +98,7 @@ public class ChalkDrawer : MonoBehaviour
     {
         bool allowed = GameManager.Instance != null ? GameManager.IsPlaying : MPMatchManager.DrawAllowed;
         if (MPMatchManager.LocalPaused) allowed = false;
+        UpdateCursor(allowed);
         if (!allowed)
         {
             holding = false;
@@ -114,7 +131,7 @@ public class ChalkDrawer : MonoBehaviour
             if (points.Count == 0)
             {
                 // not drawing yet: start as soon as the cursor is over a drawable spot
-                if (player.health > 0f && CanDraw(m)) StartStroke(m);
+                if (player.health > 0f && Time.time >= nextStrokeTime && CanDraw(m)) StartStroke(m);
             }
             else
             {
@@ -274,7 +291,12 @@ public class ChalkDrawer : MonoBehaviour
     void Finish()
     {
         if (points.Count == 0) return;
-        if (points.Count >= 2) BuildStroke();
+        if (points.Count >= 2)
+        {
+            BuildStroke();
+            if (MPMatchManager.Instance != null && !MPDrawingPhase)
+                nextStrokeTime = Time.time + strokeCooldown;
+        }
         points.Clear();
         preview.positionCount = 0;
         StrokeEnded?.Invoke();
@@ -316,7 +338,16 @@ public class ChalkDrawer : MonoBehaviour
 
     bool CanDraw(Vector2 p)
     {
-        if (MPBoard.Instance && MPDrawingPhase) return MPBoard.Instance.CanDraw(p);     // drawing phase: own half, outside no-draw zones
+        if (MPBoard.Instance && MPDrawingPhase) return MPBoard.Instance.CanDraw(p);
+
+        if (playerBorderRadius > 0f && player)
+        {
+            if (!bodyCol)
+                foreach (var c in player.GetComponentsInChildren<Collider2D>())
+                    if (!c.isTrigger) { bodyCol = c; break; }
+            if (bodyCol && Vector2.Distance(p, bodyCol.ClosestPoint(p)) <= playerBorderRadius) return false;
+        }
+
         return Physics2D.OverlapPoint(p, drawableMask) && !Physics2D.OverlapPoint(p, blockedMask);
     }
 
@@ -350,4 +381,23 @@ public class ChalkDrawer : MonoBehaviour
         lr.positionCount = 0;
         return lr;
     }
+
+    void UpdateCursor(bool active)
+    {
+        if (Application.isMobilePlatform) return;
+        int want = 0;
+        if (active && !OverUI(Input.mousePosition))
+            want = (erasing && MPMatchManager.Instance != null) ? 2 : 1;
+
+        Vector2 hot = want == 1 ? chalkHotspot : want == 2 ? eraserHotspot : Vector2.zero;
+        if (want == cursorState && hot == appliedHotspot) return;   // re-applies when you tweak the hotspot
+        cursorState = want;
+        appliedHotspot = hot;
+
+        if (want == 1 && chalkCursor) Cursor.SetCursor(chalkCursor, chalkHotspot, CursorMode.Auto);
+        else if (want == 2 && eraserCursor) Cursor.SetCursor(eraserCursor, eraserHotspot, CursorMode.Auto);
+        else Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    }
+
+    void OnDisable() { cursorState = -1; if (!Application.isMobilePlatform) Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto); }
 }

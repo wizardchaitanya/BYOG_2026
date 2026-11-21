@@ -947,7 +947,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1cbd84be1bf6714c9b4310c8b80058a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiRoot: {fileID: 0}
+  uiRoot: {fileID: 1340361421}
   designAspect: 1.7777778
   referenceHeight: 1080
   useSafeArea: 1
@@ -8311,6 +8311,7 @@ MonoBehaviour:
   waitingLabel: 'WAITING...
 
     (tap to undo)'
+  cooldownColor: {r: 0.25, g: 0.25, b: 0.25, a: 0.8}
 --- !u!1 &1371808528
 GameObject:
   m_ObjectHideFlags: 0
@@ -9484,6 +9485,30 @@ PrefabInstance:
     - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
       propertyPath: lineWidth
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: chalkCursor
+      value: 
+      objectReference: {fileID: 2800000, guid: 187bc388918c74c439674cb909ab02b1, type: 3}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: eraserCursor
+      value: 
+      objectReference: {fileID: 2800000, guid: 1fd32ee6e9c58094a897dd1db7734b5f, type: 3}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: chalkHotspot.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: chalkHotspot.y
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: eraserHotspot.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: eraserHotspot.y
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
       propertyPath: blockedMask.m_Bits

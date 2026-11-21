@@ -35,6 +35,9 @@ public class MPDrawUI : MonoBehaviour
     Tool tool = Tool.Static;
     Tool lastDrawTool = Tool.Static;      // what the E key goes back to
 
+    public Color cooldownColor = new Color(0.25f, 0.25f, 0.25f, 0.8f);
+    static Sprite white;
+
     void Start()
     {
         if (!match) match = MPMatchManager.Instance;
@@ -50,6 +53,27 @@ public class MPDrawUI : MonoBehaviour
         if (eraseButton) eraseButton.onClick.AddListener(() => Pick(Tool.Erase));
         if (raceEraseButton) raceEraseButton.onClick.AddListener(ToggleRaceErase);
         if (doneButton) doneButton.onClick.AddListener(() => { if (match) match.RequestDone(); });
+
+        if (raceEraseCooldownFill)
+        {
+            var f = raceEraseCooldownFill;
+            if (!f.sprite)
+            {
+                if (!white)
+                {
+                    var t = new Texture2D(1, 1); t.SetPixel(0, 0, Color.white); t.Apply();
+                    white = Sprite.Create(t, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+                }
+                f.sprite = white;
+            }
+            f.type = Image.Type.Filled;
+            f.fillMethod = Image.FillMethod.Radial360;
+            f.fillOrigin = (int)Image.Origin360.Top;
+            f.fillClockwise = false;          // shrinking amount = grey edge sweeps clockwise
+            f.raycastTarget = false;
+            f.color = cooldownColor;
+            f.enabled = false;
+        }
     }
 
     void OnDestroy() { if (match) match.PhaseChanged -= OnPhase; }
@@ -125,7 +149,11 @@ public class MPDrawUI : MonoBehaviour
         {
             if (Input.GetKeyDown(raceEraseKey)) ToggleRaceErase();
             float wait = match.RaceEraseWait;
-            if (raceEraseCooldownFill) raceEraseCooldownFill.fillAmount = wait / Mathf.Max(0.01f, match.raceEraseCooldown);
+            if (raceEraseCooldownFill)
+            {
+                raceEraseCooldownFill.enabled = wait > 0.001f;
+                raceEraseCooldownFill.fillAmount = wait / Mathf.Max(0.01f, match.raceEraseCooldown);
+            }
             if (raceEraseCooldownText) raceEraseCooldownText.text = wait > 0f ? Mathf.CeilToInt(wait).ToString() : "";
         }
         if (!match || match.Phase != MPPhase.Drawing) return;
