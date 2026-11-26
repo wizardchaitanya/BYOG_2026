@@ -5482,19 +5482,23 @@ PrefabInstance:
       objectReference: {fileID: 1224324477}
     - target: {fileID: 4363898724121199487, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 213.9498
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4363898724121199487, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 22.700182
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4363898724121199487, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 106.9751
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4363898724121199487, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 11.349909
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6122213102180944795, guid: b71893783c7493241b88e985bbcc820f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6178661747640234040, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -7468,8 +7472,8 @@ MonoBehaviour:
   designAspect: 1.7777778
   referenceHeight: 1080
   useSafeArea: 1
-  borderLeft: 4
-  borderRight: 4
+  borderLeft: 0
+  borderRight: 0
   borderTop: 0
   borderBottom: 0
   alignX: 0.5
