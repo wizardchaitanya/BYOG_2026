@@ -86,6 +86,9 @@ public class ChalkDrawer : MonoBehaviour
     public void SetDynamic(bool on) { dynamicMode = on; erasing = false; }
     public void SetErasing(bool on) { erasing = on; }
 
+    public event System.Action EraseDone;
+    bool erasedThisHold;
+
     void Start()
     {
         if (!cam) cam = Camera.main;
@@ -120,7 +123,11 @@ public class ChalkDrawer : MonoBehaviour
                 Tip = ToWorld(screenPos);
                 EraseAt(Tip);
             }
-            if (ended) holding = false;
+            if (ended)
+            {
+                holding = false;
+                if (erasedThisHold) { erasedThisHold = false; EraseDone?.Invoke(); }
+            }
             return;
         }
 
@@ -180,6 +187,7 @@ public class ChalkDrawer : MonoBehaviour
                 mine.RemoveAt(i);
                 MPMatchManager.Instance.RefundDrawChalk(s.ChalkCost);
                 Destroy(s.gameObject);      // NetworkPlayer notices the missing stroke and tells the opponent
+                erasedThisHold = true;
             }
             return;
         }
@@ -196,6 +204,7 @@ public class ChalkDrawer : MonoBehaviour
             {
                 NetworkPlayer.EraseRaceStroke(s);
                 m.StartRaceEraseCooldown();
+                erasedThisHold = true;      // switch to chalk when LMB is released
                 break;
             }
         }

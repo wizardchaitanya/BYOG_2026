@@ -35,7 +35,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
 
     [Header("Race")]
     public KeyCode resetKey = KeyCode.R;                 // back to the spawn point (also callable from a UI button: ResetMyPlayer)
-    [Range(2f, 5f)] public float raceEraseCooldown = 3f; // seconds to wait before the eraser works again (race only)                      // wait after drawing ends so last strokes arrive before the reveal
+    [Range(2f, 20f)] public float raceEraseCooldown = 3f; // seconds to wait before the eraser works again (race only)                      // wait after drawing ends so last strokes arrive before the reveal
 
     [Header("UI")]
     public TMP_Text countdownText;

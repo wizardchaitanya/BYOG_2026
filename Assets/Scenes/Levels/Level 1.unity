@@ -7468,10 +7468,10 @@ MonoBehaviour:
   designAspect: 1.7777778
   referenceHeight: 1080
   useSafeArea: 1
-  borderLeft: 0
-  borderRight: 0
-  borderTop: 4
-  borderBottom: 4
+  borderLeft: 4
+  borderRight: 4
+  borderTop: 0
+  borderBottom: 0
   alignX: 0.5
   alignY: 0.5
 --- !u!1 &1682198898

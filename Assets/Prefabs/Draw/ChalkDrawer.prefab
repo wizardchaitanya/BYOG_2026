@@ -51,7 +51,7 @@ MonoBehaviour:
   costPerUnit: 2
   lineWidth: 0.5
   chalkTexture: {fileID: 0}
-  strokesAreDynamic: 0
+  strokesAreDynamic: 1
   autoStatic: 1
   anchorMask:
     serializedVersion: 2
@@ -65,12 +65,21 @@ MonoBehaviour:
     m_Bits: 512
   blockedMask:
     serializedVersion: 2
-    m_Bits: 1152
+    m_Bits: 1160
   strokeLayerName: Chalk
   waterMask:
     serializedVersion: 2
     m_Bits: 16
   touchOffsetMm: 0
+  dynamicMode: 0
+  erasing: 0
+  eraseRadius: 0.4
+  chalkCursor: {fileID: 2800000, guid: 187bc388918c74c439674cb909ab02b1, type: 3}
+  eraserCursor: {fileID: 2800000, guid: 1fd32ee6e9c58094a897dd1db7734b5f, type: 3}
+  chalkHotspot: {x: 10, y: 25}
+  eraserHotspot: {x: 10, y: 25}
+  playerBorderRadius: 0.6
+  strokeCooldown: 0.4
 --- !u!114 &397423887579477994
 MonoBehaviour:
   m_ObjectHideFlags: 0

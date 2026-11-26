@@ -27,6 +27,7 @@ public class MPDrawUI : MonoBehaviour
 
     [Header("Done")]
     public Button doneButton;
+    public KeyCode doneKey = KeyCode.Space;
     public TMP_Text doneText;                // optional
     public string doneLabel = "DONE";
     public string waitingLabel = "WAITING...\n(tap to undo)";
@@ -37,6 +38,8 @@ public class MPDrawUI : MonoBehaviour
 
     public Color cooldownColor = new Color(0.25f, 0.25f, 0.25f, 0.8f);
     static Sprite white;
+
+    ChalkDrawer hooked;
 
     void Start()
     {
@@ -76,7 +79,11 @@ public class MPDrawUI : MonoBehaviour
         }
     }
 
-    void OnDestroy() { if (match) match.PhaseChanged -= OnPhase; }
+    void OnDestroy()
+    {
+        if (match) match.PhaseChanged -= OnPhase;
+        if (hooked) hooked.EraseDone -= BackToChalk;
+    }
 
     void OnPhase(MPPhase p)
     {
@@ -100,6 +107,10 @@ public class MPDrawUI : MonoBehaviour
         if (!match || match.Phase != MPPhase.Racing || MPMatchManager.LocalPaused) return;
         var d = D;
         if (!d) return;
+
+        // can't switch ON during the cooldown (switching off is still allowed)
+        if (!d.erasing && !match.RaceEraseReady) return;
+
         AudioManager.UIClick();
         d.SetErasing(!d.erasing);
         Tint(raceEraseButton, d.erasing);
@@ -145,10 +156,19 @@ public class MPDrawUI : MonoBehaviour
 
     void Update()
     {
+        var cur = D;
+        if (cur != hooked)
+        {
+            if (hooked) hooked.EraseDone -= BackToChalk;
+            hooked = cur;
+            if (cur) cur.EraseDone += BackToChalk;
+        }
+
         if (match && match.Phase == MPPhase.Racing)
         {
             if (Input.GetKeyDown(raceEraseKey)) ToggleRaceErase();
             float wait = match.RaceEraseWait;
+            if (raceEraseButton) raceEraseButton.interactable = wait <= 0f || (D && D.erasing);
             if (raceEraseCooldownFill)
             {
                 raceEraseCooldownFill.enabled = wait > 0.001f;
@@ -162,10 +182,24 @@ public class MPDrawUI : MonoBehaviour
         if (Input.GetKeyDown(raceEraseKey) && !MPMatchManager.LocalPaused)
             Pick(tool == Tool.Erase ? lastDrawTool : Tool.Erase);
 
+        if (Input.GetKeyDown(doneKey) && !MPMatchManager.LocalPaused)
+            match.RequestDone();
+
         if (timerText) timerText.text = Mathf.CeilToInt(match.DrawTimeLeft).ToString();
         if (doneText) doneText.text = match.IsLocalDone ? waitingLabel : doneLabel;
 
         // the drawer may only exist after the player prefab spawns: keep re-applying the tool for a moment
         if (Time.unscaledTime >= nextApply) { nextApply = Time.unscaledTime + 0.5f; Apply(); }
+    }
+
+    void BackToChalk()
+    {
+        if (!match) return;
+        if (match.Phase == MPPhase.Drawing) { tool = lastDrawTool; Apply(); }
+        else if (match.Phase == MPPhase.Racing)
+        {
+            if (hooked) hooked.SetErasing(false);
+            Tint(raceEraseButton, false);
+        }
     }
 }
