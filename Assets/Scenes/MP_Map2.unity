@@ -950,7 +950,7 @@ MonoBehaviour:
   uiRoot: {fileID: 1340361421}
   designAspect: 1.7777778
   referenceHeight: 1080
-  useSafeArea: 0
+  useSafeArea: 1
   borderLeft: 0
   borderRight: 0
   borderTop: 0
@@ -7554,6 +7554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 124db9f6011d1da44a3cab7aa3f850a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  practice: 0
   board: {fileID: 1080986460}
   noDrawZones:
   - {fileID: 86414734}
@@ -8188,6 +8189,10 @@ PrefabInstance:
     - target: {fileID: 742198411618873710, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 748123719690592934, guid: b71893783c7493241b88e985bbcc820f, type: 3}
+      propertyPath: mobileOnly.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1263808392126260383, guid: b71893783c7493241b88e985bbcc820f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -8973,6 +8978,8 @@ MonoBehaviour:
   - {fileID: 569270940}
   lobbySceneName: MP_Lobby
   countdownSeconds: 3
+  practiceMode: 0
+  menuSceneName: MainMenu
   endMode: 1
   drawSeconds: 60
   drawChalkLimit: 60

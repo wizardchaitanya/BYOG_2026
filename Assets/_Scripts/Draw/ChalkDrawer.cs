@@ -54,6 +54,10 @@ public class ChalkDrawer : MonoBehaviour
 
     [Header("Race stroke cooldown")]
     public float strokeCooldown = 0.4f;       // seconds before the next stroke can start (race only)
+
+    [Header("Tutorial")]
+    public static bool DrawLocked;     // tutorial: drawing disabled
+    public bool tutorialMode;          // tutorial: eraser works without MPMatchManager
     float nextStrokeTime;
     Collider2D bodyCol;
 
@@ -101,6 +105,8 @@ public class ChalkDrawer : MonoBehaviour
     {
         bool allowed = GameManager.Instance != null ? GameManager.IsPlaying : MPMatchManager.DrawAllowed;
         if (MPMatchManager.LocalPaused) allowed = false;
+        if (TutorialManager.Paused) allowed = false;
+        if (DrawLocked) allowed = false;
         UpdateCursor(allowed);
         if (!allowed)
         {
@@ -115,7 +121,7 @@ public class ChalkDrawer : MonoBehaviour
         // MP: a mouse click on a UI button must not start a stroke (touch already checks this)
         if (began && !(MPMatchManager.Instance != null && OverUI(screenPos))) holding = true;
 
-        if (erasing && MPMatchManager.Instance != null)
+        if (erasing && (MPMatchManager.Instance != null || tutorialMode))
         {
             if (points.Count > 0) Finish();
             if (holding && held)
@@ -175,6 +181,22 @@ public class ChalkDrawer : MonoBehaviour
 
     void EraseAt(Vector2 p)
     {
+        if (tutorialMode)
+        {
+            var tm = TutorialManager.Instance;
+            if (tm && !tm.DusterReady) return;
+            for (int i = ChalkStroke.All.Count - 1; i >= 0; i--)
+            {
+                var s = ChalkStroke.All[i];
+                if (!s || s.DistanceTo(p) > eraseRadius) continue;
+                Destroy(s.gameObject);
+                if (tm) tm.StartDusterCooldown();
+                erasedThisHold = true;      // fires EraseDone on release, which switches back to chalk
+                break;
+            }
+            return;
+        }
+
         if (MPDrawingPhase)
         {
             // drawing phase: erase my own strokes, get the chalk back
@@ -396,7 +418,7 @@ public class ChalkDrawer : MonoBehaviour
         if (Application.isMobilePlatform) return;
         int want = 0;
         if (active && !OverUI(Input.mousePosition))
-            want = (erasing && MPMatchManager.Instance != null) ? 2 : 1;
+            want = (erasing && (MPMatchManager.Instance != null || tutorialMode)) ? 2 : 1;
 
         Vector2 hot = want == 1 ? chalkHotspot : want == 2 ? eraserHotspot : Vector2.zero;
         if (want == cursorState && hot == appliedHotspot) return;   // re-applies when you tweak the hotspot

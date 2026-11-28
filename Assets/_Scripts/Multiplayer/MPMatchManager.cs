@@ -27,6 +27,10 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
     public string lobbySceneName = "MP_Lobby";
     public int countdownSeconds = 3;
 
+    [Header("Practice (single player)")]
+    public bool practiceMode;
+    public string menuSceneName = "MainMenu";
+
     [Header("Drawing phase")]
     public DrawEndMode endMode = DrawEndMode.Timer;      // Timer: ends when time runs out. Button: ends when both players press Done.
     public float drawSeconds = 60f;                      // only used in Timer mode
@@ -132,10 +136,24 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        if (practiceMode) { StartCoroutine(StartPractice()); return; }
         if (PhotonNetwork.InRoom) { Spawn(); return; }
         // pressed Play directly on the map: run solo for testing
         PhotonNetwork.OfflineMode = true;
         PhotonNetwork.CreateRoom("offline-test");
+    }
+
+    IEnumerator StartPractice()
+    {
+        if (PhotonNetwork.InRoom) PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.IsConnected && !PhotonNetwork.OfflineMode)
+        {
+            PhotonNetwork.Disconnect();
+            while (PhotonNetwork.IsConnected) yield return null;
+        }
+        PhotonNetwork.OfflineMode = true;
+        PhotonNetwork.NickName = PlayerProfile.PlayerName;
+        PhotonNetwork.CreateRoom("practice");
     }
 
     public override void OnJoinedRoom() => Spawn();
@@ -342,7 +360,7 @@ public class MPMatchManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.OfflineMode = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { "ready", null } });
-        SceneManager.LoadScene(lobbySceneName);
+        SceneManager.LoadScene(practiceMode ? menuSceneName : lobbySceneName);
     }
 
     // Rematch button OnClick

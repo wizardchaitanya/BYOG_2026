@@ -21,6 +21,7 @@ public class MobileButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             case Kind.Pause:
                 if (GameManager.Instance) GameManager.Instance.Pause();
                 else if (MPMatchManager.Instance) MPMatchManager.Instance.Pause();
+                else if (TutorialManager.Instance) TutorialManager.Instance.Pause();
                 break;
         }
     }

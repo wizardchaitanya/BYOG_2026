@@ -6,6 +6,7 @@ public static class PlayerProfile
     const string CharKey = "profile_character";
     const string ColorKey = "profile_chalk_color";
     const string NameKey = "profile_name";
+    const string TutKey = "profile_tutorial_done";
 
     static bool loaded;
     static int character;
@@ -66,5 +67,11 @@ public static class PlayerProfile
     {
         s = (s ?? "").Trim();
         return s.Length > 16 ? s.Substring(0, 16) : s;
+    }
+    
+    public static bool TutorialDone
+    {
+        get { return PlayerPrefs.GetInt(TutKey, 0) == 1; }
+        set { PlayerPrefs.SetInt(TutKey, value ? 1 : 0); PlayerPrefs.Save(); }
     }
 }

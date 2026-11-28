@@ -2,6 +2,7 @@ using Photon.Pun;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 // Name pop-up. First launch: forced (no cancel). Later: opened by a "Change name" button -> Open().
 public class NameInputUI : MonoBehaviour
@@ -14,6 +15,8 @@ public class NameInputUI : MonoBehaviour
     public TMP_Text currentNameText;      // optional: shows the saved name on the menu
     public int minLength = 2;
     public int maxLength = 12;
+
+    public string tutorialSceneName = "MP_Tutorial";
 
     bool required;
 
@@ -56,6 +59,7 @@ public class NameInputUI : MonoBehaviour
         PhotonNetwork.NickName = n;
         Refresh();
         panel.SetActive(false);
+        if (!PlayerProfile.TutorialDone) SceneManager.LoadScene(tutorialSceneName);
     }
 
     void Cancel()

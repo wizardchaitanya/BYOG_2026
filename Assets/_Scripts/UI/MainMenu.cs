@@ -18,8 +18,19 @@ public class MainMenu : MonoBehaviour
     public Transform levelButtonContainer;          // add a Grid Layout Group to it
     public bool unlockAllLevels = false;            // tick for testing
 
+    public string practiceSceneName = "MP_Practice1";
+
+    public string tutorialSceneName = "MP_Tutorial";
+    public void PlayPractice() { AudioManager.UIClick(); SceneManager.LoadScene(practiceSceneName); }
+
     void Start()
     {
+
+        if (PlayerProfile.HasName && !PlayerProfile.TutorialDone)
+        {
+            SceneManager.LoadScene(tutorialSceneName);
+            return;
+        }
         Time.timeScale = 1f;
         ShowMain();
     }

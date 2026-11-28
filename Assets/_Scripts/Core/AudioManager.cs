@@ -60,6 +60,8 @@ public class AudioManager : MonoBehaviour
         if (Instance && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        ApplySettings();
+        GameSettings.Changed += ApplySettings;
 
         for (int i = 0; i < music.Length; i++)
         {
@@ -83,6 +85,7 @@ public class AudioManager : MonoBehaviour
     void OnDestroy()
     {
         if (Instance != this) return;
+        GameSettings.Changed -= ApplySettings;
         SceneManager.sceneLoaded -= OnSceneLoaded;
         Instance = null;
     }
@@ -204,5 +207,12 @@ public class AudioManager : MonoBehaviour
             case GameState.Dead:     Instance.duckTarget = 0.4f; Instance.PlayClip(Instance.death, 1f, 0f); break;
             case GameState.Complete: Instance.duckTarget = 0.5f; Instance.PlayClip(Instance.levelComplete, 1f, 0f); break;
         }
+    }
+
+    void ApplySettings()
+    {
+        masterVolume = GameSettings.Master;
+        musicVolume = GameSettings.Music;
+        sfxVolume = GameSettings.Sfx;
     }
 }

@@ -9,6 +9,9 @@ public class MPBoard : MonoBehaviour
 {
     public static MPBoard Instance { get; private set; }
 
+    [Header("Practice (single player)")]
+    public bool practice;   // no fog, can draw on both sides, split line is only visual
+
     [Header("Area")]
     public Collider2D board;                 // whole drawable board (trigger BoxCollider2D). Its centre X = the split line.
     public Collider2D[] noDrawZones;         // trigger BoxCollider2Ds
@@ -44,6 +47,7 @@ public class MPBoard : MonoBehaviour
     {
         myIndex = index;
         if (fog) Destroy(fog.gameObject);
+        if (practice) return;
 
         Bounds b = board.bounds;
         float xMin, xMax;
@@ -69,8 +73,11 @@ public class MPBoard : MonoBehaviour
     public bool CanDraw(Vector2 p)
     {
         if (!board || !board.OverlapPoint(p)) return false;
-        if (myIndex == 0) { if (p.x > midX - midGap) return false; }
-        else if (p.x < midX + midGap) return false;
+        if (!practice)
+        {
+            if (myIndex == 0) { if (p.x > midX - midGap) return false; }
+            else if (p.x < midX + midGap) return false;
+        }
         foreach (var z in noDrawZones)
             if (z && z.OverlapPoint(p)) return false;
         return true;

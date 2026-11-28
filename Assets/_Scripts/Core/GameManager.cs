@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     // other scripts check this; true when there is no manager in the scene
-    public static bool IsPlaying => Instance != null ? Instance.State == GameState.Playing : MPMatchManager.CanPlay;
+    public static bool IsPlaying => Instance != null ? Instance.State == GameState.Playing
+        : (MPMatchManager.CanPlay && !TutorialManager.Paused);
 
     public ChalkPlayer player;
 

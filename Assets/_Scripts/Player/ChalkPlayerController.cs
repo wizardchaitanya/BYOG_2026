@@ -47,6 +47,7 @@ public class ChalkPlayerController : MonoBehaviour
     bool grounded, onWall, facingRight = true;
 
     public bool Grounded => grounded;
+    public static event System.Action Jumped;
 
     void Awake()
     {
@@ -139,6 +140,7 @@ public class ChalkPlayerController : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, jumpForce * JumpScale);
         AudioManager.Jump();
         bufferCounter = 0f; coyoteCounter = 0f;
+        Jumped?.Invoke();
     }
 
     void WallJump()
@@ -149,6 +151,7 @@ public class ChalkPlayerController : MonoBehaviour
         AudioManager.Jump();
         bufferCounter = 0f;
         Flip();
+        Jumped?.Invoke();
     }
 
     void Flip()

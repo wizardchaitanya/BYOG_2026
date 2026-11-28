@@ -38,18 +38,19 @@ public class MobileGyroJump : MonoBehaviour
 
         bool flick = false;
         float value = 0f;
+        float k = GameSettings.Scale(GameSettings.JumpSensitivity);
 
         if (hasGyro)
         {
             value = Input.gyro.rotationRateUnbiased.magnitude;
-            flick = value > flickThreshold;
+            flick = value > flickThreshold * k;
         }
         else if (useAccelFallback)
         {
             Vector3 a = Input.acceleration;
             value = (a - lastAccel).magnitude / Mathf.Max(Time.unscaledDeltaTime, 0.001f) * 0.02f;
             lastAccel = a;
-            flick = (a - lastAccel).magnitude > accelThreshold || value > accelThreshold;
+            flick = (a - lastAccel).magnitude > accelThreshold * k || value > accelThreshold * k;
         }
 
         if (showDebug && value > 0.5f) Debug.Log("Flick value: " + value);
