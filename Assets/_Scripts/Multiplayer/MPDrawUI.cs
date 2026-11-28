@@ -2,22 +2,30 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Drawing-phase panel: timer + Static / Dynamic / Erase tools + Done button.
-// Put it on the Canvas (inside UIRoot). Panel is only visible during the drawing phase.
+// Drawing-phase UI: timer + one Chalk/Eraser toggle. Dynamic drawing is disabled for now (static only).
+// The fog over the opponent's half carries the instruction text + Done button.
+// Player 1 (left half) sees the fog panel on the RIGHT, player 2 sees it on the LEFT.
 public class MPDrawUI : MonoBehaviour
 {
     public MPMatchManager match;             // optional, found automatically
     public ChalkDrawer drawer;               // optional: leave empty if the drawer sits on the player prefab
 
-    public GameObject panel;                 // everything that should show only while drawing
+    public GameObject panel;                 // shown only while drawing (timer + tool button)
     public TMP_Text timerText;
 
-    [Header("Tools")]
-    public Button staticButton;
-    public Button dynamicButton;
-    public Button eraseButton;
-    public Color activeColor = new Color(1f, 0.92f, 0.4f);
+    [Header("Tool toggle (Chalk <-> Eraser)")]
+    public Button toolButton;
+    public Image toolIcon;                   // optional: swaps between the two sprites
+    public Sprite chalkSprite;               // shown while drawing
+    public Sprite eraserSprite;              // shown while the eraser is active
+    public Color activeColor = new Color(1f, 0.92f, 0.4f);   // button colour while erasing
     public Color idleColor = Color.white;
+
+    [Header("Fog side panels (place each over its half of the board, under UIRoot)")]
+    public FogSidePanel leftFogPanel;        // used when I'm the RIGHT player (fog on the left)
+    public FogSidePanel rightFogPanel;       // used when I'm the LEFT player (fog on the right)
+    [TextArea] public string instruction = "Draw your path on the {0} half.\nPress DONE when you're ready.";
+    [TextArea] public string instructionTimer = "Draw your path on the {0} half.\nThe race starts when time runs out.";
 
     [Header("Race eraser (shown during the race)")]
     public Button raceEraseButton;
@@ -25,21 +33,21 @@ public class MPDrawUI : MonoBehaviour
     public Image raceEraseCooldownFill;      // optional: Image Type = Filled, shows the recharge
     public TMP_Text raceEraseCooldownText;   // optional: seconds left
 
-    [Header("Done")]
+    [Header("Done (optional extra button outside the fog)")]
     public Button doneButton;
     public KeyCode doneKey = KeyCode.Space;
     public TMP_Text doneText;                // optional
     public string doneLabel = "DONE";
     public string waitingLabel = "WAITING...\n(tap to undo)";
 
-    enum Tool { Static, Dynamic, Erase }
+    enum Tool { Static, Erase }
     Tool tool = Tool.Static;
-    Tool lastDrawTool = Tool.Static;      // what the E key goes back to
 
     public Color cooldownColor = new Color(0.25f, 0.25f, 0.25f, 0.8f);
     static Sprite white;
 
     ChalkDrawer hooked;
+    FogSidePanel activeSide;
 
     void Start()
     {
@@ -49,13 +57,17 @@ public class MPDrawUI : MonoBehaviour
             match.PhaseChanged += OnPhase;
             OnPhase(match.Phase);
         }
-        else if (panel) panel.SetActive(false);
+        else
+        {
+            if (panel) panel.SetActive(false);
+            ShowSides(null);
+        }
 
-        if (staticButton) staticButton.onClick.AddListener(() => Pick(Tool.Static));
-        if (dynamicButton) dynamicButton.onClick.AddListener(() => Pick(Tool.Dynamic));
-        if (eraseButton) eraseButton.onClick.AddListener(() => Pick(Tool.Erase));
+        if (toolButton) toolButton.onClick.AddListener(ToggleTool);
         if (raceEraseButton) raceEraseButton.onClick.AddListener(ToggleRaceErase);
-        if (doneButton) doneButton.onClick.AddListener(() => { if (match) match.RequestDone(); });
+        HookDone(doneButton);
+        HookDone(leftFogPanel ? leftFogPanel.doneButton : null);
+        HookDone(rightFogPanel ? rightFogPanel.doneButton : null);
 
         if (raceEraseCooldownFill)
         {
@@ -79,6 +91,11 @@ public class MPDrawUI : MonoBehaviour
         }
     }
 
+    void HookDone(Button b)
+    {
+        if (b) b.onClick.AddListener(() => { if (match) match.RequestDone(); });
+    }
+
     void OnDestroy()
     {
         if (match) match.PhaseChanged -= OnPhase;
@@ -92,14 +109,36 @@ public class MPDrawUI : MonoBehaviour
         Tint(raceEraseButton, false);
         var drw = D;
         if (drw) drw.SetErasing(false);                 // every phase starts in draw mode
+
         if (p == MPPhase.Drawing)
         {
-            tool = lastDrawTool = Tool.Static;
+            tool = Tool.Static;
             Apply();
-            // only the control for the active end mode is shown
             if (timerText) timerText.gameObject.SetActive(match.UsesTimer);
             if (doneButton) doneButton.gameObject.SetActive(match.UsesButton);
+
+            // fog is on the opponent's half: I'm left (index 0) -> fog on the right, and vice versa
+            bool practice = MPBoard.Instance && MPBoard.Instance.practice;
+            int mine = match.MyIndex;
+            ShowSides(practice ? null : (mine == 0 ? rightFogPanel : leftFogPanel));
+
+            if (activeSide)
+            {
+                string side = mine == 0 ? "LEFT" : "RIGHT";
+                if (activeSide.instructionText)
+                    activeSide.instructionText.text = string.Format(match.UsesTimer ? instructionTimer : instruction, side);
+                if (activeSide.timerText) activeSide.timerText.gameObject.SetActive(match.UsesTimer);
+                if (activeSide.doneButton) activeSide.doneButton.gameObject.SetActive(match.UsesButton);
+            }
         }
+        else ShowSides(null);
+    }
+
+    void ShowSides(FogSidePanel show)
+    {
+        activeSide = show;
+        if (leftFogPanel) leftFogPanel.gameObject.SetActive(leftFogPanel == show);
+        if (rightFogPanel) rightFogPanel.gameObject.SetActive(rightFogPanel == show);
     }
 
     void ToggleRaceErase()
@@ -116,11 +155,12 @@ public class MPDrawUI : MonoBehaviour
         Tint(raceEraseButton, d.erasing);
     }
 
-    void Pick(Tool t)
+    // one button: chalk <-> eraser
+    void ToggleTool()
     {
+        if (!match || match.Phase != MPPhase.Drawing || MPMatchManager.LocalPaused) return;
         AudioManager.UIClick();
-        tool = t;
-        if (t != Tool.Erase) lastDrawTool = t;
+        tool = tool == Tool.Erase ? Tool.Static : Tool.Erase;
         Apply();
     }
 
@@ -139,12 +179,15 @@ public class MPDrawUI : MonoBehaviour
         var d = D;
         if (d)
         {
+            d.SetDynamic(false);                 // dynamic drawing is off for now
             d.SetErasing(tool == Tool.Erase);
-            if (tool != Tool.Erase) d.SetDynamic(tool == Tool.Dynamic);
         }
-        Tint(staticButton, tool == Tool.Static);
-        Tint(dynamicButton, tool == Tool.Dynamic);
-        Tint(eraseButton, tool == Tool.Erase);
+        Tint(toolButton, tool == Tool.Erase);
+        if (toolIcon)
+        {
+            var s = tool == Tool.Erase ? eraserSprite : chalkSprite;
+            if (s) toolIcon.sprite = s;
+        }
     }
 
     void Tint(Button b, bool on)
@@ -178,24 +221,31 @@ public class MPDrawUI : MonoBehaviour
         }
         if (!match || match.Phase != MPPhase.Drawing) return;
 
-        // E: switch to the eraser, press again to go back to the previous Static/Dynamic tool
-        if (Input.GetKeyDown(raceEraseKey) && !MPMatchManager.LocalPaused)
-            Pick(tool == Tool.Erase ? lastDrawTool : Tool.Erase);
+        // E: toggle chalk <-> eraser
+        if (Input.GetKeyDown(raceEraseKey) && !MPMatchManager.LocalPaused) ToggleTool();
 
         if (Input.GetKeyDown(doneKey) && !MPMatchManager.LocalPaused)
             match.RequestDone();
 
-        if (timerText) timerText.text = Mathf.CeilToInt(match.DrawTimeLeft).ToString();
-        if (doneText) doneText.text = match.IsLocalDone ? waitingLabel : doneLabel;
+        string time = Mathf.CeilToInt(match.DrawTimeLeft).ToString();
+        string label = match.IsLocalDone ? waitingLabel : doneLabel;
+        if (timerText) timerText.text = time;
+        if (doneText) doneText.text = label;
+        if (activeSide)
+        {
+            if (activeSide.timerText) activeSide.timerText.text = time;
+            if (activeSide.doneText) activeSide.doneText.text = label;
+        }
 
         // the drawer may only exist after the player prefab spawns: keep re-applying the tool for a moment
         if (Time.unscaledTime >= nextApply) { nextApply = Time.unscaledTime + 0.5f; Apply(); }
     }
 
+    // erased one stroke in the drawing phase: stay on the eraser. In the race: back to chalk.
     void BackToChalk()
     {
         if (!match) return;
-        if (match.Phase == MPPhase.Drawing) { tool = lastDrawTool; Apply(); }
+        if (match.Phase == MPPhase.Drawing) { Apply(); }
         else if (match.Phase == MPPhase.Racing)
         {
             if (hooked) hooked.SetErasing(false);

@@ -8496,11 +8496,21 @@ MonoBehaviour:
   drawer: {fileID: 1959844107}
   panel: {fileID: 1012382193}
   timerText: {fileID: 246430411}
-  staticButton: {fileID: 1004148285}
-  dynamicButton: {fileID: 1591782505}
-  eraseButton: {fileID: 702178034}
+  toolButton: {fileID: 0}
+  toolIcon: {fileID: 0}
+  chalkSprite: {fileID: 0}
+  eraserSprite: {fileID: 0}
   activeColor: {r: 1, g: 0.8506314, b: 0.26981127, a: 1}
   idleColor: {r: 1, g: 1, b: 1, a: 1}
+  leftFogPanel: {fileID: 0}
+  rightFogPanel: {fileID: 0}
+  instruction: 'Draw your path on the {0} half.
+
+    Press DONE when you''re ready.'
+  instructionTimer: 'Draw your path on the {0} half.
+
+    The race starts when time
+    runs out.'
   raceEraseButton: {fileID: 1942030210}
   raceEraseKey: 101
   raceEraseCooldownFill: {fileID: 1803139702}
@@ -9837,6 +9847,10 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 250511520}
+    - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
+      propertyPath: erasing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 434211419363448451, guid: 1022a941861fb754f846c57fbe8027a5, type: 3}
       propertyPath: anchorRadius
       value: 0.7

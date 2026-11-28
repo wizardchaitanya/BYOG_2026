@@ -283,6 +283,7 @@ MonoBehaviour:
   debugSheltered: 0
   debugShelteredBy: 
   regenEnabled: 0
+  noChalkDeath: 0
   regenRate: 12
   regenDelay: 0.6
   isRemote: 0
@@ -318,7 +319,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1216
   groundCheck: {fileID: 4650389938953601909}
-  groundCheckRadius: 0.15
+  groundCheckRadius: 0.3
   wallCheck: {fileID: 3229567540205928085}
   wallCheckRadius: 0.12
   footstepInterval: 0.38
@@ -416,7 +417,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnDelay: 2
-  liveSendInterval: 0.05
   nameFont: {fileID: 11400000, guid: 573a83c8b1aaf084987957787c3e0185, type: 2}
   nameSize: 8
   nameHeight: 0.5
